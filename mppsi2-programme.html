@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Programme — MP / PSI — 2ème année</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Spectral:wght@500;600&family=Fraunces:opsz,wght@9..144,500&family=Work+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;}
+  html,body{margin:0; min-height:100vh;}
+  .topnav{position:sticky; top:0; z-index:60; display:flex; justify-content:space-between; align-items:center; padding:14px 22px; backdrop-filter:blur(6px); font-family:'IBM Plex Mono',monospace; font-size:12px;}
+  .topnav a{text-decoration:none; opacity:.75;}
+  .topnav a:hover{opacity:1;}
+  .switcher{display:flex; gap:6px;}
+  .switcher button{font-family:'IBM Plex Mono', monospace; font-size:12.5px; padding:8px 16px; border-radius:100px; border:1px solid currentColor; background:transparent; cursor:pointer; opacity:.55;}
+  .switcher button.active{opacity:1; font-weight:500;}
+  .view{display:none; padding:0 24px 90px;}
+  .view.active{display:block;}
+
+  body.view-map{background:radial-gradient(ellipse at 20% 0%, #EEF1FA 0%, #FFFFFF 55%); color:#1A1F2E;}
+  body.view-map .topnav, body.view-map .switcher button{color:#1A1F2E;}
+  body.view-map .switcher button.active{background:#17766F22; border-color:#17766F; color:#17766F;}
+  #view-map{max-width:1020px; margin:0 auto;}
+  #view-map h1{font-family:'Space Grotesk', sans-serif; font-weight:700; font-size:clamp(26px,4vw,40px); margin:24px 0 6px;}
+  #view-map .sub{color:#5B6478; font-size:14.5px; max-width:560px; line-height:1.5; margin-bottom:30px; font-family:'IBM Plex Sans',sans-serif;}
+  #view-map .legend{display:flex; gap:24px; font-size:12px; color:#5B6478; margin-bottom:14px; font-family:'IBM Plex Sans',sans-serif;}
+  #view-map .legend span{display:flex; align-items:center; gap:7px;}
+  #view-map .dot{width:9px; height:9px; border-radius:50%; display:inline-block;}
+  #view-map svg{width:100%; height:auto; overflow:visible;}
+  #view-map .path{fill:none; stroke:#5C6B96; stroke-width:2; stroke-dasharray:6 8;}
+  #view-map .station{cursor:pointer;}
+  #view-map .station circle{fill:#F1F3F8; stroke:#5C6B96; stroke-width:2; transition:all .2s ease;}
+  #view-map .station.p2 circle{stroke:#2E8078;}
+  #view-map .station:hover circle, #view-map .station.active circle{fill:#17766F; stroke:#17766F;}
+  #view-map .station:hover .num, #view-map .station.active .num{fill:#FFFFFF;}
+  #view-map .num{fill:#1A1F2E; font-family:'Space Grotesk',sans-serif; font-size:15px; font-weight:700; text-anchor:middle; dominant-baseline:central; pointer-events:none;}
+  #view-map .label{fill:#5B6478; font-size:12px; text-anchor:middle; pointer-events:none; font-family:'IBM Plex Sans',sans-serif;}
+  #view-map .panel{max-width:1020px; margin:36px auto 0; background:#F1F3F8; border:1px solid #5C6B96; border-radius:4px; padding:26px 30px; min-height:110px; font-family:'IBM Plex Sans',sans-serif;}
+  #view-map .panel .tag{display:inline-block; font-size:11.5px; color:#17766F; border:1px solid #2E8078; padding:3px 9px; border-radius:100px; margin-bottom:12px;}
+  #view-map .panel h2{font-family:'Space Grotesk',sans-serif; margin:0 0 10px; font-size:20px; font-weight:500;}
+  #view-map .panel p{margin:0; color:#5B6478; line-height:1.6; font-size:14px; max-width:640px;}
+  #view-map .panel ul{margin:12px 0 0; padding-left:18px; color:#5B6478; font-size:13.5px; line-height:1.7;}
+  #view-map .placeholder{color:#5B6478; font-size:14px;}
+
+  body.view-poster{background: linear-gradient(#DCD8CC 1px, transparent 1px) 0 0/32px 32px, linear-gradient(90deg, #DCD8CC 1px, transparent 1px) 0 0/32px 32px, #F6F4EE; color:#1E2A3A;}
+  body.view-poster .topnav, body.view-poster .switcher button{color:#1E2A3A;}
+  body.view-poster .switcher button.active{background:#17766F18; border-color:#17766F; color:#17766F;}
+  #view-poster{max-width:1180px; margin:0 auto; font-family:'Work Sans',sans-serif;}
+  #view-poster header{display:flex; justify-content:space-between; align-items:flex-end; border-bottom:2px solid #1E2A3A; padding:24px 0 14px; margin-bottom:32px;}
+  #view-poster h1{font-family:'Spectral',serif; font-weight:600; font-size:30px; margin:0;}
+  #view-poster .meta{font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:#17766F; text-align:right; line-height:1.6;}
+  #view-poster .columns{display:grid; grid-template-columns:1fr 1fr; gap:36px;}
+  #view-poster .col-head{display:flex; align-items:center; gap:12px; margin-bottom:16px;}
+  #view-poster .col-head .swatch{width:20px; height:20px; flex-shrink:0;}
+  #view-poster .col1 .swatch{background:#17766F;}
+  #view-poster .col2 .swatch{background:#8A5A3E;}
+  #view-poster .col-head h2{font-family:'Spectral',serif; font-size:18px; font-weight:600; margin:0;}
+  #view-poster .note{font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:#6B7280; margin-bottom:14px;}
+  #view-poster .block{border:1.5px solid #1E2A3A; background:#fff; padding:14px 16px; margin-bottom:14px; position:relative;}
+  #view-poster .col1 .block{border-left:5px solid #17766F;}
+  #view-poster .col2 .block{border-left:5px solid #8A5A3E;}
+  #view-poster .block h3{font-family:'Spectral',serif; font-size:15px; margin:0 0 5px;}
+  #view-poster .block .items{font-size:12.5px; color:#4B5563; line-height:1.6;}
+  #view-poster .block .items span{display:inline-block; margin-right:9px;}
+  #view-poster .block .items span::before{content:"—"; margin-right:5px; color:#17766F;}
+  #view-poster .tag{position:absolute; top:-10px; right:12px; background:#F6F4EE; font-family:'IBM Plex Mono',monospace; font-size:10px; padding:0 7px; color:#6B7280;}
+  @media (max-width:800px){#view-poster .columns{grid-template-columns:1fr;}}
+
+  body.view-frise{background:#FBFAF7; color:#26302A;}
+  body.view-frise .topnav, body.view-frise .switcher button{color:#26302A;}
+  body.view-frise .switcher button.active{background:#17766F18; border-color:#17766F; color:#17766F;}
+  #view-frise{max-width:860px; margin:0 auto; font-family:'Work Sans',sans-serif;}
+  #view-frise h1{font-family:'Fraunces',serif; font-weight:500; font-size:clamp(28px,4vw,38px); margin:28px 0 8px;}
+  #view-frise .sub{color:#8A8F87; font-size:14.5px; margin-bottom:50px; max-width:520px; line-height:1.55;}
+  #view-frise .timeline{position:relative; padding-left:26px;}
+  #view-frise .timeline::before{content:""; position:absolute; left:5px; top:6px; bottom:6px; width:2px; background:#17766F55;}
+  #view-frise .period-marker{font-size:12px; color:#17766F; font-weight:500; margin:0 0 16px;}
+  #view-frise .period-marker:not(:first-child){margin-top:44px;}
+  #view-frise .item{position:relative; padding-bottom:28px;}
+  #view-frise .item::before{content:""; position:absolute; left:-26px; top:4px; width:10px; height:10px; border-radius:50%; background:#FBFAF7; border:2px solid #17766F;}
+  #view-frise .item h3{font-size:16px; font-weight:500; margin:0 0 4px;}
+  #view-frise .item p{font-size:13.5px; color:#8A8F87; line-height:1.5; margin:0; max-width:560px;}
+</style>
+</head>
+<body class="view-map">
+
+<div class="topnav">
+  <a href="mppsi2.html">← MP / PSI — 2ème année</a>
+  <div class="switcher">
+    <button data-view="map" class="active">Carte</button>
+    <button data-view="poster">Poster</button>
+    <button data-view="frise">Frise</button>
+  </div>
+  <span></span>
+</div>
+
+<div class="view active" id="view-map">
+  <h1>Le programme — MP / PSI — 2ème année</h1>
+  <p class="sub">Dix chapitres, deux périodes. Clique sur une escale pour voir le détail.</p>
+  <div class="legend"><span><i class="dot" style="background:#5C6B96"></i> Période 1</span><span><i class="dot" style="background:#2E8078"></i> Période 2</span></div>
+  <svg viewBox="0 0 980 260" id="svgmap"><path class="path" d="M 40 180 Q 130 60 220 140 T 400 100 T 580 160 Q 660 210 740 120 T 940 90" /></svg>
+  <div class="panel" id="panel"><p class="placeholder">↑ Choisis une escale sur la carte pour commencer.</p></div>
+</div>
+
+<div class="view" id="view-poster">
+  <header>
+    <h1>MP / PSI — 2ème année</h1>
+    <div class="meta">CPGE Mohammedia · Filières MP / PSI<br>Programme officiel — Informatique</div>
+  </header>
+  <div class="columns">
+    <div class="col1"><div class="col-head"><div class="swatch"></div><h2>Période 1</h2></div><div class="note">Fondations et consolidation.</div><div id="poster-col1"></div></div>
+    <div class="col2"><div class="col-head"><div class="swatch"></div><h2>Période 2</h2></div><div class="note">Applications interdisciplinaires.</div><div id="poster-col2"></div></div>
+  </div>
+</div>
+
+<div class="view" id="view-frise">
+  <h1>Le fil de l'année</h1>
+  <p class="sub">Dix étapes, deux périodes, dans l'ordre.</p>
+  <div class="timeline" id="frise-timeline"></div>
+</div>
+
+<script>
+const topics = [{"period": 1, "title": "La complexité algorithmique", "short": "Complexité", "desc": "Évaluer un programme au-delà de sa correction : combien de temps, combien de mémoire ?", "items": ["Complexité temporelle vs spatiale", "Meilleur cas / pire cas", "Notation asymptotique (grand O)", "Cas itératif et récursif"], "x": 40, "y": 180}, {"period": 1, "title": "Algorithmes de tri", "short": "Tri", "desc": "Au-delà des tris simples de 1ère année : des méthodes bien plus efficaces.", "items": ["Tri rapide : principe, choix du pivot", "Tri par fusion", "Comparaison des complexités", "Tri en place, stabilité"], "x": 220, "y": 140}, {"period": 1, "title": "Les arbres binaires", "short": "Arbres", "desc": "Une structure hiérarchique omniprésente : de l'informatique à la biologie.", "items": ["Terminologie : racine, feuille, hauteur, profondeur", "Représentation par listes", "Parcours préfixe / infixe / postfixe / largeur", "Arbres binaires de recherche, tas"], "x": 400, "y": 100}, {"period": 1, "title": "Algorithmes gloutons", "short": "Glouton", "desc": "Des choix localement optimaux — qui ne mènent pas toujours à l'optimum global.", "items": ["Propriété de sous-structure optimale", "Contre-exemples de non-optimalité", "Rendu de monnaie, sac à dos, arbre de Huffman"], "x": 490, "y": 130}, {"period": 1, "title": "Programmation dynamique", "short": "Prog. dynamique", "desc": "Réduire la complexité en réutilisant les sous-solutions déjà calculées.", "items": ["Approches Top-down et Bottom-up", "Extraction de formules récursives", "Plus longue sous-séquence commune, distance de Levenshtein, sac à dos"], "x": 580, "y": 160}, {"period": 1, "title": "Méta-heuristique", "short": "Méta-heuristique", "desc": "Quand l'exact devient trop coûteux : viser une bonne solution, pas forcément la meilleure.", "items": ["Principe des méta-heuristiques", "Algorithme du recuit simulé"], "x": 660, "y": 210}, {"period": 2, "title": "Introduction à la théorie des graphes", "short": "Graphes", "desc": "Sommets, arcs, chemins : modéliser des problèmes du monde réel.", "items": ["Vocabulaire : degré, chemin, cycle, connexité", "Listes / matrices d'adjacence", "Parcours en largeur et en profondeur", "Dijkstra, coloration, Floyd-Warshall"], "x": 740, "y": 120}, {"period": 2, "title": "Introduction à l'intelligence artificielle", "short": "IA", "desc": "Premiers pas en apprentissage automatique, supervisé et non supervisé.", "items": ["Apprentissage supervisé : KNN, matrice de confusion", "Apprentissage non supervisé : k-moyennes", "Applications pratiques"], "x": 860, "y": 95}, {"period": 2, "title": "Introduction à la théorie des jeux", "short": "Théorie des jeux", "desc": "Jeux à somme nulle et stratégies gagnantes, en lien avec les graphes.", "items": ["Jeux d'accessibilité à deux joueurs", "Positions gagnantes, attracteurs", "Algorithme Minimax"], "x": 900, "y": 70}, {"period": 2, "title": "Les bases de données relationnelles", "short": "Bases de données", "desc": "Modéliser, stocker et interroger des données avec SQL.", "items": ["Modèle entité-association, clés primaires/étrangères", "INSERT, UPDATE, DELETE FROM", "SELECT, jointures, GROUP BY, requêtes imbriquées"], "x": 940, "y": 90}];
+
+const svg = document.getElementById('svgmap');
+const ns = "http://www.w3.org/2000/svg";
+topics.forEach((s, i) => {
+  const g = document.createElementNS(ns, "g");
+  g.setAttribute("class", "station" + (s.period === 2 ? " p2" : ""));
+  g.setAttribute("data-i", i);
+  const circle = document.createElementNS(ns, "circle");
+  circle.setAttribute("cx", s.x); circle.setAttribute("cy", s.y); circle.setAttribute("r", 17);
+  g.appendChild(circle);
+  const num = document.createElementNS(ns, "text");
+  num.setAttribute("x", s.x); num.setAttribute("y", s.y); num.setAttribute("class", "num");
+  num.textContent = i + 1;
+  g.appendChild(num);
+  const label = document.createElementNS(ns, "text");
+  label.setAttribute("x", s.x); label.setAttribute("y", s.y + 34); label.setAttribute("class", "label");
+  label.textContent = s.short;
+  g.appendChild(label);
+  g.addEventListener("click", () => showPanel(i));
+  svg.appendChild(g);
+});
+function showPanel(i){
+  document.querySelectorAll('#view-map .station').forEach(el => el.classList.remove('active'));
+  document.querySelector('#view-map .station[data-i="'+i+'"]').classList.add('active');
+  const s = topics[i];
+  document.getElementById('panel').innerHTML = `
+    <span class="tag">${s.period === 1 ? 'Période 1' : 'Période 2'} — Chapitre ${i+1}</span>
+    <h2>${s.title}</h2>
+    <p>${s.desc}</p>
+    <ul>${s.items.map(it => `<li>${it}</li>`).join('')}</ul>`;
+}
+
+const col1 = document.getElementById('poster-col1');
+const col2 = document.getElementById('poster-col2');
+topics.forEach((s, i) => {
+  const block = document.createElement('div');
+  block.className = 'block';
+  block.innerHTML = `<span class="tag">${i+1}</span><h3>${s.title}</h3><div class="items">${s.items.map(it => `<span>${it}</span>`).join('')}</div>`;
+  (s.period === 1 ? col1 : col2).appendChild(block);
+});
+
+const tl = document.getElementById('frise-timeline');
+let lastPeriod = null;
+topics.forEach((s, i) => {
+  if (s.period !== lastPeriod){
+    const marker = document.createElement('div');
+    marker.className = 'period-marker';
+    marker.textContent = s.period === 1 ? 'Période 1' : 'Période 2';
+    tl.appendChild(marker);
+    lastPeriod = s.period;
+  }
+  const item = document.createElement('div');
+  item.className = 'item';
+  item.innerHTML = `<h3>${i+1} · ${s.title}</h3><p>${s.desc}</p>`;
+  tl.appendChild(item);
+});
+
+document.querySelectorAll('.switcher button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.switcher button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const view = btn.dataset.view;
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById('view-' + view).classList.add('active');
+    document.body.className = 'view-' + view;
+  });
+});
+</script>
+</body>
+</html>

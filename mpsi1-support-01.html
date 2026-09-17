@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Chapitre 1 — Architecture & représentation des nombres</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters:[{left:'$$',right:'$$',display:true},{left:'\\[',right:'\\]',display:true},{left:'$',right:'$',display:false}]});"></script>
+<style>
+  :root{
+    --bg:#FFFFFF; --bg2:#F1F3F8; --panel:#F7F8FB; --line:#D8DCE6;
+    --accent:#C97F1E; --accent-dim:#B98A3E;
+    --ink:#1A1F2E; --ink-dim:#5B6478;
+    --def:#2F5FA8; --def-bg:#EAF1FC;
+    --ex:#2F8F52; --ex-bg:#EAF7EE;
+    --att:#C23B3B; --att-bg:#FBE9E9;
+    --ast:#B08A1B; --ast-bg:#FBF3DC;
+    --rem:#6B7280; --rem-bg:#F1F2F4;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:radial-gradient(ellipse at 15% -10%, #EEF1FA 0%, var(--bg) 55%);
+    color:var(--ink); font-family:'IBM Plex Sans', sans-serif; line-height:1.65;
+  }
+  .topnav{
+    position:sticky; top:0; z-index:50; display:flex; justify-content:space-between; align-items:center;
+    padding:14px 26px; backdrop-filter:blur(8px); background:#FFFFFFcc; border-bottom:1px solid var(--line);
+    font-family:'IBM Plex Mono', monospace; font-size:12px;
+  }
+  .topnav a{color:var(--ink-dim); text-decoration:none;}
+  .topnav a:hover{color:var(--accent);}
+  .topnav .crumbs{display:flex; gap:10px;}
+  .topnav .crumbs span{opacity:.4;}
+
+  .wrap{max-width:760px; margin:0 auto; padding:0 24px 100px;}
+  .hero{padding:48px 0 20px;}
+  .tag{display:inline-block; font-family:'IBM Plex Mono', monospace; font-size:11.5px; color:var(--accent); border:1px solid var(--accent-dim); padding:3px 10px; border-radius:100px; margin-bottom:16px;}
+  h1{font-family:'Space Grotesk', sans-serif; font-size:clamp(26px,4vw,36px); font-weight:700; margin:0 0 14px; line-height:1.2;}
+  .intro{color:var(--ink-dim); font-size:15.5px; font-style:italic; border-left:2px solid var(--accent-dim); padding-left:18px; margin:24px 0 8px;}
+
+  .toc{margin:32px 0 44px; padding:18px 22px; background:var(--panel); border:1px solid var(--line); border-radius:8px; font-family:'IBM Plex Mono', monospace; font-size:12.5px;}
+  .toc .part{color:var(--accent); margin:14px 0 6px; font-size:11px; letter-spacing:.05em; text-transform:uppercase;}
+  .toc .part:first-child{margin-top:0;}
+  .toc a{display:block; color:var(--ink); text-decoration:none; padding:3px 0 3px 6px; opacity:.85;}
+  .toc a:hover{color:var(--accent); opacity:1;}
+
+  .part-title{font-family:'IBM Plex Mono', monospace; font-size:12px; color:var(--accent); letter-spacing:.06em; text-transform:uppercase; margin:64px 0 -6px;}
+  h2{font-family:'Space Grotesk', sans-serif; font-size:21px; font-weight:600; margin:18px 0 16px; padding-top:14px; border-top:1px solid var(--line);}
+  h3{font-family:'Space Grotesk', sans-serif; font-size:16.5px; font-weight:500; margin:28px 0 10px; color:var(--ink);}
+  p{font-size:15px; margin:0 0 16px;}
+  strong{color:#0B0F1A; font-weight:600;}
+  em{color:var(--ink);}
+  code{background:var(--bg2); padding:1px 6px; border-radius:4px; font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--accent);}
+
+  ul, ol{padding-left:22px; font-size:15px;}
+  li{margin-bottom:8px;}
+
+  .box{margin:22px 0; border-radius:6px; overflow:hidden; border:1px solid; font-size:14.5px;}
+  .box .box-title{font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:12.5px; padding:9px 16px; letter-spacing:.02em;}
+  .box .box-body{padding:14px 16px 16px;}
+  .box.def{border-color:var(--def); background:var(--def-bg);} .box.def .box-title{background:var(--def); color:#FFFFFF;}
+  .box.ex{border-color:var(--ex); background:var(--ex-bg);} .box.ex .box-title{background:var(--ex); color:#FFFFFF;}
+  .box.att{border-color:var(--att); background:var(--att-bg);} .box.att .box-title{background:var(--att); color:#FFFFFF;}
+  .box.ast{border-color:var(--ast); background:var(--ast-bg);} .box.ast .box-title{background:var(--ast); color:#2a2408;}
+  .box.rem{border-color:var(--rem); background:var(--rem-bg);} .box.rem .box-title{background:var(--rem); color:#12151c;}
+
+  table{width:100%; border-collapse:collapse; margin:22px 0; font-size:13.5px;}
+  th, td{border:1px solid var(--line); padding:9px 11px; text-align:left; vertical-align:top;}
+  th{background:var(--bg2); font-family:'Space Grotesk',sans-serif; font-weight:500; color:var(--accent);}
+  td{color:var(--ink-dim);}
+
+  .eqs{background:var(--bg2); border:1px solid var(--line); border-radius:6px; padding:16px 20px; margin:18px 0; text-align:center;}
+
+  .schema{margin:26px 0; background:var(--bg2); border:1px solid var(--line); border-radius:8px; padding:18px 16px 8px;}
+  .schema svg{width:100%; height:auto; display:block;}
+  .schema .caption{font-family:'IBM Plex Mono', monospace; font-size:11.5px; color:var(--ink-dim); text-align:center; padding:10px 4px 4px;}
+
+  .figure{margin:26px 0; background:#F4F2EC; border:1px solid var(--line); border-radius:8px; padding:18px 18px 8px; text-align:center;}
+  .figure img{max-width:100%; height:auto; display:inline-block; border-radius:3px;}
+  .figure .caption{font-family:'IBM Plex Mono', monospace; font-size:11.5px; color:var(--ink-dim); text-align:center; padding:12px 4px 6px; background:var(--bg2); margin:14px -18px 0; border-top:1px solid var(--line);}
+  .figure.photo{background:#0d0d0d;}
+
+  pre{background:var(--bg2); border:1px solid var(--line); border-radius:6px; padding:14px 16px; overflow-x:auto; font-family:'IBM Plex Mono',monospace; font-size:12.5px; color:var(--ink); margin:18px 0;}
+
+  .nextprev{display:flex; justify-content:space-between; margin-top:60px; padding-top:24px; border-top:1px solid var(--line); font-family:'IBM Plex Mono',monospace; font-size:12.5px;}
+  .nextprev a{color:var(--ink-dim); text-decoration:none;}
+  .nextprev a:hover{color:var(--accent);}
+</style>
+</head>
+<body>
+
+<div class="topnav">
+  <div class="crumbs"><a href="index.html">Accueil</a><span>/</span><a href="mpsi1.html">MPSI · 1ère année</a><span>/</span><a href="mpsi1-programme.html">Programme</a></div>
+  <a href="mpsi1.html">← Retour aux chapitres</a>
+</div>
+
+<div class="wrap">
+  <div class="hero">
+    <span class="tag">Chapitre 1 · Période 1 · MPSI 1ère année</span>
+    <h1>Architecture des ordinateurs & représentation des nombres</h1>
+    <p class="intro">Dans ce premier chapitre, nous précisons ce qu'on peut désigner sous le terme d'ordinateur, du modèle théorique de Turing au modèle concret de Von Neumann — puis nous descendons jusqu'aux 0 et aux 1 pour voir comment nombres entiers et nombres à virgule y sont représentés.</p>
+  </div>
+
+  <div class="toc">
+    <div class="part">Partie A — Architecture des ordinateurs</div>
+    <a href="#ordinateur">1. Qu'est-ce qu'un ordinateur ?</a>
+    <a href="#turing">2. Turing et ses machines</a>
+    <a href="#vonneumann">3. Le modèle de Von Neumann</a>
+    <a href="#roles">4. Le rôle de chaque élément</a>
+    <a href="#avantages">5. Avantages et inconvénients</a>
+    <a href="#grandeurs">6. Ordres de grandeur</a>
+    <div class="part">Partie B — Représentation des données</div>
+    <a href="#entiersnaturels">7. Représentation des entiers naturels</a>
+    <a href="#relatifs">8. Représentation des entiers relatifs</a>
+    <a href="#depassements">9. Dépassements de capacité</a>
+    <a href="#flottants">10. Nombres à virgule flottante</a>
+    <a href="#arrondis">11. Les arrondis</a>
+  </div>
+
+  <div class="part-title">Partie A — Architecture des ordinateurs</div>
+
+  <h2 id="ordinateur">1. Qu'est-ce qu'un ordinateur ? Une tâche complexe</h2>
+  <p>Tenter de définir un ordinateur, au sens large incluant tablettes et smartphones, peut sembler simple à première vue. On pourrait proposer trois critères de base :</p>
+  <ul>
+    <li>Il reçoit des informations (de l'utilisateur ou d'un réseau) ;</li>
+    <li>Il émet des informations (via un réseau ou des périphériques) ;</li>
+    <li>Il nécessite une source d'énergie pour fonctionner.</li>
+  </ul>
+  <p>Cependant, cette définition s'avère insuffisante. De nombreux appareils remplissent ces critères sans être considérés comme des ordinateurs : un réfrigérateur avec ses capteurs et signaux, un interrupteur sensible à la lumière, le système ABS d'une voiture, les systèmes électroniques embarqués en général.</p>
+  <p>La différence clé réside dans la <strong>polyvalence</strong> : un ordinateur peut être reprogrammé pour effectuer diverses tâches, contrairement aux systèmes à fonction unique. Cette difficulté de définition rejoint une question fondamentale du XXᵉ siècle : <strong>qu'est-ce qu'un calcul ?</strong></p>
+
+  <h2 id="turing">2. Turing et ses machines</h2>
+  <p>Les années 1930 marquent une avancée majeure dans la compréhension de la calculabilité grâce aux travaux de Kleene, Church, Turing et Post. Turing introduit un concept novateur : une machine capable d'effectuer des calculs de manière entièrement automatique. Cette <strong>machine de Turing</strong> est équipée de :</p>
+  <ul>
+    <li>un ruban infini divisé en cases, sur lequel elle peut lire et écrire des données ;</li>
+    <li>une tête de lecture qui se déplace le long du ruban ;</li>
+    <li>un ensemble fini d'états : quand la machine lit un symbole, elle réagit en fonction de son état actuel et du symbole lu, en changeant d'état, en modifiant le symbole sur le ruban et en déplaçant la tête d'un cran à droite ou à gauche.</li>
+  </ul>
+
+  <div class="figure">
+    <img src="images/ruban_turing.png" alt="Ruban d'une machine de Turing">
+    <div class="caption">Figure 1 — Un ruban d'une machine de Turing</div>
+  </div>
+
+  <p>Donnons une brève description d'une machine de Turing testant si un nombre naturel $n$ écrit en binaire est divisible par 3. Sur le ruban d'entrée se trouve le mot écrit en binaire de gauche à droite, les bits de poids forts au début. La machine doit écrire à la suite du nombre le symbole « V » ou « F » suivant si le nombre est divisible par 3 ou non. On imagine une machine à 4 états :</p>
+  <ul>
+    <li>3 états correspondant à la congruence modulo 3 de la portion du nombre lue jusqu'ici, notés 0, 1, 2 ;</li>
+    <li>un état supplémentaire (final) indiquant que le calcul est fini.</li>
+  </ul>
+  <p>Le tableau suivant donne la congruence modulo 3 de $2a$ et $2a+1$ en fonction de celle de $a$ :</p>
+  <table>
+    <tr><th>$a$</th><td>0</td><td>1</td><td>2</td></tr>
+    <tr><th>$2a$</th><td>0</td><td>2</td><td>1</td></tr>
+    <tr><th>$2a+1$</th><td>1</td><td>0</td><td>2</td></tr>
+  </table>
+  <p>Si la portion des bits lue jusque-là représente $a$ en binaire, lire un 0 mène à la représentation de $2a$, et lire un 1 mène à celle de $2a+1$. En commençant à l'état 0, la lecture successive des bits du nombre 666 en binaire fait passer successivement par les états 1, 2, 2, 1, 2, 2, 2, 1, 0, 0 — on écrit donc « V » car on termine à l'état 0 : 666 est bien divisible par 3.</p>
+
+  <p>Dans l'exemple précédent, on a fait essentiellement de la lecture, mais on peut aussi <strong>calculer</strong> : pour additionner 1 au nombre naturel écrit en binaire sur le ruban (bits de poids forts au début), il suffit de se déplacer jusqu'à la fin du mot (caractérisée par une case vide), de revenir d'un cran à gauche, puis de remplacer les 1 par des 0 en se déplaçant vers la gauche, jusqu'à retomber sur un 0 ou une case vide, qu'on transforme en 1.</p>
+
+  <div class="figure">
+    <img src="images/Turing_machine.png" alt="Automate d'une machine de Turing incrémentant de 1 un nombre binaire">
+    <div class="caption">Figure 2 — Automate de la machine « +1 » et son ruban</div>
+  </div>
+
+  <div class="box att">
+    <div class="box-title">Attention</div>
+    <div class="box-body">La « machine de Turing » reste un objet théorique : le ruban est supposé toujours suffisamment long pour permettre le calcul (virtuellement infini), même si une machine exécutant un calcul qui termine n'utilisera qu'une partie finie du ruban. Avec ce formalisme, <strong>un algorithme est simplement une machine de Turing particulière</strong>.</div>
+  </div>
+
+  <p>Comme le nombre d'états d'une machine de Turing est fini, sa description peut elle-même être encodée en binaire et écrite sur un ruban. Turing montre qu'il existe une <strong>machine de Turing universelle</strong>, capable de prendre sur un ruban la description de n'importe quelle machine de Turing et de simuler son exécution. Un ordinateur est donc la réalisation concrète d'une telle machine universelle : il exécute un algorithme pour peu qu'il soit traduit dans un langage de programmation adéquat.</p>
+
+  <h2 id="vonneumann">3. Prémices aux ordinateurs et modèle de Von Neumann</h2>
+  <p>La première réalisation concrète d'une machine de Turing date de 1941 : c'est le Z3 allemand, électromécanique. La première réalisation entièrement électronique est l'ENIAC (1943), conçu par John William Mauchly et John Eckert, pleinement opérationnel en 1946.</p>
+
+  <div class="figure photo">
+    <img src="images/ENIAC.jpg" alt="L'ENIAC, premier ordinateur entièrement électronique">
+    <div class="caption">Figure 3 — L'ENIAC (1943-1946)</div>
+  </div>
+
+  <p>Von Neumann intègre l'équipe en 1944 et publie en 1945 un rapport sur la conception de l'EDVAC, décrivant un schéma d'architecture organisé en trois éléments (unité arithmétique, unité de commande, mémoire contenant programme et données). Ce rapport décrit aussi des principes de réalisation pour ces éléments — si cet aspect a partiellement vieilli avec la technologie de l'époque, le modèle d'architecture, qui marque une transition profonde avec les pratiques antérieures, reste d'une étonnante actualité.</p>
+
+  <div class="figure">
+    <img src="images/Neumann.png" alt="Schéma de l'architecture de Von Neumann">
+    <div class="caption">Figure 4 — Architecture de Von Neumann</div>
+  </div>
+
+  <p>Ce modèle, auquel reste attaché son nom, comporte schématiquement quatre composants principaux :</p>
+  <ul>
+    <li>le <strong>processeur</strong>, qui se décompose en une unité de commande et une unité arithmétique et logique ;</li>
+    <li>la <strong>mémoire</strong>, qui contient des instructions et des données ;</li>
+    <li>les <strong>périphériques d'entrée-sortie</strong>, qui permettent la communication avec l'utilisateur (clavier, souris, écran...) ;</li>
+    <li>le <strong>bus</strong>, canal de communication entre la mémoire, le processeur et les périphériques.</li>
+  </ul>
+
+  <p>La première innovation est la séparation nette entre l'<strong>unité de commande</strong>, chargée d'organiser le flot des instructions, et l'<strong>unité arithmétique</strong>, chargée de leur exécution. La seconde innovation est l'idée du <strong>programme enregistré</strong> : fini les rubans et cartes à trous — instructions et données sont enregistrées dans la mémoire selon un codage conventionnel. Un <em>compteur ordinal</em> (program counter) contient l'adresse de l'instruction en cours ; il est automatiquement incrémenté après exécution, et explicitement modifié par les instructions de branchement (<code>if</code>, <code>goto</code>, <code>jump</code>...).</p>
+
+  <h2 id="roles">4. Le rôle de chaque élément</h2>
+  <p><strong>Le processeur.</strong> Le CPU est le cerveau de l'ordinateur : il donne des ordres aux périphériques et à la mémoire, et exécute le programme. Il dispose d'une toute petite mémoire — quelques dizaines ou centaines de mots de 64 bits — appelée <em>registres</em>. Le registre de données contient les données transitant avec l'extérieur ; l'accumulateur contient les opérandes ou résultats de l'unité arithmétique et logique, qui réalise additions, multiplications, soustractions, divisions, ainsi que conjonction, disjonction et négation logiques.</p>
+
+  <div class="figure">
+    <img src="images/circuitCPU.png" alt="Circuit en portes logiques d'une unité arithmétique et logique">
+    <div class="caption">Figure 5 — Le circuit (portes logiques) d'une unité arithmétique et logique sur des mots de 2 bits</div>
+  </div>
+
+  <p>L'unité de contrôle accède à la mémoire via le bus pour lire ou écrire une case mémoire, mais ne contient pas elle-même le programme : les instructions sont codées sous forme d'une suite de bits stockée en mémoire, exécutées dans l'ordre sauf instructions de saut :</p>
+  <ul>
+    <li>une instruction de <strong>saut conditionnel</strong> modifie l'ordre si une condition est vérifiée ;</li>
+    <li>une instruction de <strong>saut inconditionnel</strong> modifie l'ordre sans condition.</li>
+  </ul>
+  <p>Les instructions <code>for</code> et <code>while</code> (qui n'existent pas en langage machine) sont traduites par plusieurs instructions de saut conditionnelles et inconditionnelles.</p>
+  <p><strong>La mémoire.</strong> Suite de bits, organisés en octets (paquets de 8) puis en mots mémoire de 64 bits. Un mot peut représenter une instruction, un entier... la signification dépend de l'utilisation qu'on en fait. La mémoire ne réalise aucune opération : chaque mot possède une adresse, attribuée de manière aléatoire — d'où le nom <em>Random Access Memory (RAM)</em>.</p>
+  <p><strong>Les périphériques.</strong> Mémoire supplémentaire dans laquelle le processeur écrit pour donner des ordres (afficher une couleur sur un pixel) ou lit pour recevoir des informations (touche tapée sur un clavier). Ce sont les éléments physiques qui permettent d'interagir avec le monde extérieur — en entrée (clavier, souris) ou en sortie (écran, imprimante).</p>
+
+  <h2 id="avantages">5. Avantages et inconvénients</h2>
+  <p>L'architecture de Von Neumann permet une grande souplesse car on peut stocker virtuellement tout type de structure en mémoire — données ou programmes. Elle possède cependant trois inconvénients :</p>
+  <ul>
+    <li><strong>Exécution monotâche</strong> : les instructions sont exécutées séquentiellement, on ne peut donc faire qu'une seule chose à la fois ;</li>
+    <li><strong>Le bus</strong> : les processeurs sont devenus si rapides qu'ils passent beaucoup de temps à attendre le transfert des données ;</li>
+    <li><strong>Faible robustesse</strong> : données et programmes étant dans la même mémoire, un bug provoquant une écriture non désirée peut compromettre toute la machine.</li>
+  </ul>
+
+  <div class="box rem">
+    <div class="box-title">De nos jours</div>
+    <div class="box-body">L'architecture a peu évolué mais s'est enrichie : mémoire <strong>morte</strong> (ROM, non volatile, pour le firmware/BIOS) en plus de la RAM ; <strong>mémoire de masse</strong> (disque dur, flash) pour les données utilisateur ; <strong>accès direct à la mémoire</strong> (DMA) pour certains périphériques sans passer par le processeur ; processeurs <strong>multi-cœurs</strong> pour augmenter la puissance de calcul sans augmenter celle d'un cœur individuel, limitée par l'évacuation de la chaleur.</div>
+  </div>
+
+  <h2 id="grandeurs">6. Ordres de grandeur</h2>
+  <p>Il est important de connaître grossièrement ce qu'il est possible de calculer et de stocker : une fois estimées les ressources en temps et en mémoire d'un algorithme, on peut savoir s'il s'exécutera sans problème ou s'il manquera de temps ou de mémoire.</p>
+
+  <div class="figure">
+    <img src="images/architec_reelle.png" alt="Architecture réelle : CPU, RAM, ROM, E/S reliés par les bus d'adressage et de données">
+    <div class="caption">Figure 6 — Architecture réelle</div>
+  </div>
+
+  <table>
+    <tr><th>Ressource</th><th>Ordre de grandeur actuel</th><th>Remarque</th></tr>
+    <tr><td>Fréquence processeur</td><td>quelques GHz → $10^9$ opérations élémentaires / seconde</td><td>En pratique, avec un langage haut niveau comme Python, on retient plutôt $10^7$ opérations « élémentaires » par seconde.</td></tr>
+    <tr><td>Mémoire vive (RAM)</td><td>de l'ordre du Go (giga-octet)</td><td>Au-delà, on tombe dans le <em>swap</em> : usage du disque dur, à l'accès bien plus lent.</td></tr>
+    <tr><td>Mémoire de masse</td><td>de l'ordre du To (téra-octet)</td><td>Peu rapide, mais permet un grand volume de stockage.</td></tr>
+  </table>
+
+  <div class="part-title">Partie B — Représentation des données</div>
+
+  <h2 id="entiersnaturels">7. Représentation des entiers naturels</h2>
+  <p>Les ordinateurs et les programmes mémorisent, transmettent et transforment des données aussi variées que des nombres, des textes, des images, des sons. Pourtant, à petite échelle, ils ne manipulent que des objets bien plus simples : des 0 et des 1.</p>
+  <h3>Représentation par des booléens</h3>
+  <p>La mémoire des ordinateurs est constituée d'une multitude de petits circuits électroniques qui, chacun, ne peuvent être que dans deux états : sous tension ou hors tension. On a décidé de les appeler 0 et 1 — une telle valeur est dite <strong>booléenne</strong>, ou <strong>bit</strong> (<em>binary digit</em>). L'état d'un circuit composé de plusieurs bits est représenté par une suite finie de 0 et de 1, qu'on appelle un <strong>mot</strong>. Par exemple, le mot 100 décrit l'état d'un circuit de trois bits, respectivement 1, 0 et 0.</p>
+
+  <h3>La numération à position et les bases</h3>
+  <p>Depuis le Moyen-Âge, on écrit les entiers naturels en notation décimale à position : pour écrire $n$, on imagine $n$ objets, groupés par paquets de dix, puis en paquets de dix paquets, etc. Le choix de faire des paquets de dix est conventionnel — on aurait pu choisir deux, cinq, douze, seize, etc. : on parle alors de numération en base $k$.</p>
+
+  <div class="box rem">
+    <div class="box-title">Remarque</div>
+    <div class="box-body">La base 2 joue un rôle essentiel en informatique, en raison de l'organisation de la mémoire en suites de bits. L'autre base fréquemment utilisée est la base 16, dite <strong>hexadécimale</strong> : on regroupe les bits par paquets de quatre, ce qui donne des valeurs en base $2^4=16$.</div>
+  </div>
+
+  <div class="box def">
+    <div class="box-title">Savoir-faire — représenter en base k un entier donné en base 10</div>
+    <div class="box-body">Pour écrire un entier naturel en base $k$, on a besoin de $k$ chiffres. Quand on a $n$ objets, on les groupe par paquets de $k$, puis en paquets de $k$ paquets, etc. — autrement dit, on effectue une succession de divisions par $k$, jusqu'à obtenir un quotient nul.</div>
+  </div>
+
+  <pre>Algorithme — conversion d'un nombre de base 10 vers la base k
+Entrée : n ≥ 0, k > 1 (entiers)
+  i ← 0
+  tant que n ≠ 0 :
+      a_i ← n mod k        # reste de la division euclidienne
+      n   ← n // k         # quotient de la division euclidienne
+      i   ← i + 1
+Sortie : la représentation a_(i-1)...a_1 a_0 de n en base k</pre>
+
+  <div class="box def">
+    <div class="box-title">Savoir-faire — représenter en base dix un entier donné en base k</div>
+    <div class="box-body">
+      En base $k$, le chiffre le plus à droite représente les unités, le précédent les paquets de $k$, le suivant $k^2$, etc. Si $a_i \ldots a_1 a_0$ est l'écriture de $n$ en base $k$ :
+      <div class="eqs">$$n = a_0 + a_1 k + a_2 k^2 + \cdots + a_i k^i$$</div>
+      On peut aussi utiliser la méthode de Horner, plus efficace, qui lit les chiffres de gauche à droite :
+      <div class="eqs">$$n = ((\ldots(a_i k + a_{i-1})k + \ldots)k + a_1)k + a_0$$</div>
+    </div>
+  </div>
+
+  <h3>La base deux</h3>
+  <p>La mémoire des ordinateurs étant constituée de circuits à deux états, les ordinateurs comptent naturellement en base deux. Par exemple, le nombre treize s'écrit $1101$ : de droite à gauche, 1 unité, 0 « deuzaine », 1 « quatraine » et 1 « huitaine ». L'écriture d'un entier en binaire est en moyenne 3,2 fois plus longue qu'en base dix, mais ne demande que deux chiffres.</p>
+  <p>Les circuits mémoire sont souvent groupés par huit (les <strong>octets</strong>), avec des mots de 1, 2, 4 ou 8 octets (8, 16, 32 ou 64 bits), permettant de représenter :</p>
+  <table>
+    <tr><th>Taille du mot</th><th>Plage représentable</th></tr>
+    <tr><td>1 octet (8 bits)</td><td>0 à 255</td></tr>
+    <tr><td>2 octets (16 bits)</td><td>0 à 65 535</td></tr>
+    <tr><td>4 octets (32 bits)</td><td>0 à 4 294 967 295</td></tr>
+    <tr><td>8 octets (64 bits)</td><td>0 à 18 446 744 073 709 551 615</td></tr>
+  </table>
+  <p>On appelle ces représentations des <strong>entiers non signés</strong>. En Python, aucun type ne donne directement accès à cette représentation : on ne manipule que des entiers relatifs.</p>
+
+  <h2 id="relatifs">8. Représentation des entiers relatifs</h2>
+  <h3>Notation en complément à deux</h3>
+  <p>Une première idée consisterait à réserver un bit pour le signe et à utiliser les autres pour la valeur absolue — mais cette méthode a des inconvénients, notamment l'existence de deux zéros (positif et négatif).</p>
+  <p>On applique donc une autre méthode : représenter un entier relatif par un entier naturel. Avec des mots de $n$ bits, on représente un entier relatif $x$ positif ou nul comme l'entier naturel $x$ (compris entre 0 et $2^{n-1}-1$), et un entier relatif $x$ strictement négatif comme l'entier naturel $x + 2^n$ (compris entre $2^{n-1}$ et $2^n - 1$).</p>
+
+  <div class="schema">
+    <svg viewBox="0 0 640 130" xmlns="http://www.w3.org/2000/svg">
+      <rect x="20" y="40" width="290" height="40" fill="#2F8F5222" stroke="#2F8F52" stroke-width="2"/>
+      <text x="165" y="65" text-anchor="middle" fill="#1A1F2E" font-family="IBM Plex Mono, monospace" font-size="13">0 … 2ⁿ⁻¹ − 1</text>
+      <text x="165" y="100" text-anchor="middle" fill="#2F8F52" font-family="IBM Plex Mono, monospace" font-size="11">entiers positifs ou nuls</text>
+
+      <rect x="320" y="40" width="290" height="40" fill="#C23B3B22" stroke="#C23B3B" stroke-width="2"/>
+      <text x="465" y="65" text-anchor="middle" fill="#1A1F2E" font-family="IBM Plex Mono, monospace" font-size="13">2ⁿ⁻¹ … 2ⁿ − 1</text>
+      <text x="465" y="100" text-anchor="middle" fill="#C23B3B" font-family="IBM Plex Mono, monospace" font-size="11">entiers strictement négatifs (x + 2ⁿ)</text>
+
+      <text x="20" y="30" fill="#5B6478" font-family="IBM Plex Mono, monospace" font-size="11">Espace des entiers naturels représentables sur n bits</text>
+    </svg>
+    <div class="caption">Schéma — complément à deux : partage de l'espace des mots de n bits</div>
+  </div>
+
+  <p>Avec des mots de 16 bits, on représente ainsi les entiers relatifs de −32 768 à 32 767. L'entier relatif −1 est représenté comme l'entier naturel 65 535, soit le mot <code>1111 1111 1111 1111</code>. Il reste facile de déterminer le signe : un entier positif ou nul a son premier bit à 0, un entier strictement négatif a son premier bit à 1.</p>
+
+  <div class="box rem">
+    <div class="box-title">Remarque — la mémoire n'a pas de sens a priori</div>
+    <div class="box-body">Rien dans la représentation binaire n'indique comment interpréter un mot mémoire donné : le même mot peut être lu de plusieurs façons, toutes aussi correctes les unes que les autres. Il faut donc garder trace des conventions de codage utilisées — c'est le rôle du système de types dans les langages de programmation évolués.</div>
+  </div>
+
+  <div class="box def">
+    <div class="box-title">Savoir-faire — calculer la représentation de l'opposé d'un entier relatif</div>
+    <div class="box-body">Sur 8 bits : si $x$ est représenté par l'entier naturel $p$, son opposé $-x$ est représenté par $p' = 256 - p = (255-p) + 1$. Calculer $255-p = 11111111 - p$ revient à inverser chaque bit de $p$ (0 devient 1, 1 devient 0), puis à ajouter 1 au résultat.</div>
+  </div>
+
+  <h2 id="depassements">9. Dépassements de capacité</h2>
+  <p>Puisque les nombres représentables sont limités, que se passe-t-il aux limites ? En représentation sur 32 bits :</p>
+  <pre>>>> a = 260
+>>> a*a
+67600
+>>> a*a*a
+17576000
+>>> a*a*a*a
+4569760000</pre>
+  <p>Le dernier résultat, 4 569 760 000, nécessite 33 bits. En représentation sur 32 bits, le bit le plus à gauche est perdu : on ne mémorise que 274 792 704, qui n'est évidemment pas le résultat attendu. On appelle ce phénomène <strong>dépassement arithmétique</strong> (<em>overflow</em>).</p>
+
+  <div class="box att">
+    <div class="box-title">Attention</div>
+    <div class="box-body">Avec le complément à deux, la somme de deux entiers positifs trop grands peut donner un résultat <strong>négatif</strong> ! De même, la somme de deux entiers négatifs peut résulter en un entier positif. Par exemple, $2\,000\,000\,000 + 2\,000\,000\,000$ sur 32 bits donne $-294\,967\,296$ et non 4 milliards.</div>
+  </div>
+
+  <p>En Python, la seule limite pour représenter des entiers est la mémoire disponible sur la machine : les dépassements ci-dessus ne s'y produisent donc pas. Pour représenter des entiers de taille arbitraire, l'implémentation de référence de Python découpe la représentation binaire par paquets de 15 bits (machines 32 bits) ou 30 bits (machines 64 bits), et stocke les « chiffres » obtenus dans un tableau, associé à une taille dont le signe donne le signe du nombre.</p>
+
+  <h2 id="flottants">10. Représentation des nombres à virgule</h2>
+  <p>La notation binaire permet aussi de représenter des nombres à virgule : les chiffres à droite de la virgule représentent des demis, des quarts, des huitièmes, etc. Mais cette écriture directe ne permet pas de représenter des nombres très grands ou très petits (nombre d'Avogadro, constante de Planck). On utilise donc une notation « scientifique » en base deux, définie par la <strong>norme IEEE 754</strong> : un nombre s'écrit $s \cdot m \cdot 2^n$, où $s$ est le signe, $n$ l'exposant (entier relatif) et $m$ la mantisse (comprise entre 1 inclus et 2 exclu).</p>
+  <p>Sur 64 bits, on utilise 1 bit pour le signe, 11 bits pour l'exposant et 52 bits pour la mantisse :</p>
+
+  <div class="schema">
+    <svg viewBox="0 0 640 110" xmlns="http://www.w3.org/2000/svg">
+      <rect x="20" y="30" width="30" height="40" fill="#C23B3B22" stroke="#C23B3B" stroke-width="2"/>
+      <text x="35" y="90" text-anchor="middle" fill="#C23B3B" font-family="IBM Plex Mono, monospace" font-size="11">Signe</text>
+      <text x="35" y="103" text-anchor="middle" fill="#5B6478" font-family="IBM Plex Mono, monospace" font-size="10">1 bit</text>
+
+      <rect x="50" y="30" width="140" height="40" fill="#B08A1B22" stroke="#B08A1B" stroke-width="2"/>
+      <text x="120" y="90" text-anchor="middle" fill="#B08A1B" font-family="IBM Plex Mono, monospace" font-size="11">Exposant</text>
+      <text x="120" y="103" text-anchor="middle" fill="#5B6478" font-family="IBM Plex Mono, monospace" font-size="10">11 bits</text>
+
+      <rect x="190" y="30" width="430" height="40" fill="#2F5FA822" stroke="#2F5FA8" stroke-width="2"/>
+      <text x="405" y="90" text-anchor="middle" fill="#2F5FA8" font-family="IBM Plex Mono, monospace" font-size="11">Mantisse</text>
+      <text x="405" y="103" text-anchor="middle" fill="#5B6478" font-family="IBM Plex Mono, monospace" font-size="10">52 bits</text>
+    </svg>
+    <div class="caption">Schéma — répartition des 64 bits d'un nombre à virgule flottante (IEEE 754)</div>
+  </div>
+
+  <ul>
+    <li>Le signe + est représenté par 0, le signe − par 1.</li>
+    <li>L'exposant $n$, compris entre −1022 et 1023, est représenté comme l'entier naturel $n+1023$ (entre 1 et 2046). Les valeurs 0 et 2047 sont réservées à des cas exceptionnels.</li>
+    <li>La mantisse $m$, comprise entre 1 et 2, a toujours un 1 implicite avant la virgule : on utilise donc les 52 bits pour les 52 chiffres après la virgule, pour une précision réelle de 53 bits.</li>
+  </ul>
+
+  <div class="box def">
+    <div class="box-title">Savoir-faire — lire un flottant IEEE 754 en base dix</div>
+    <div class="box-body">On identifie signe $s$, mantisse $m$ et exposant $n$, en tenant compte du décalage de 1023. Si $s$ est le bit de signe, $e_1\ldots e_{11}$ les bits d'exposant et $m_1\ldots m_{52}$ ceux de la mantisse :
+      <div class="eqs">$$(-1)^s \times 2^{(e_1\ldots e_{11} - 1023)} \times \left(1 + \sum_{i=1}^{52} m_i \frac{1}{2^i}\right)$$</div>
+    </div>
+  </div>
+
+  <div class="box rem">
+    <div class="box-title">Cas particuliers</div>
+    <div class="box-body">Le zéro ne peut théoriquement pas être représenté (mantisse censée commencer par un 1 implicite) : par convention, un nombre vaut zéro si et seulement si tous les bits d'exposant et de mantisse valent 0 — il existe donc un zéro positif et un zéro négatif. Les valeurs $+\infty$, $-\infty$ et $NaN$ (Not a Number, résultant par exemple d'une division par zéro) sont codées avec un exposant entièrement à 1.</div>
+  </div>
+
+  <h3>Dépassements et problèmes de précision</h3>
+  <p>64 bits ne suffisent plus si l'exposant dépasse 1023, ou si l'exposant vaut 1023 avec une mantisse trop grande : on parle de <strong>dépassement arithmétique</strong>, produisant $+\infty$ ou $-\infty$ plutôt qu'une simple troncature. À l'inverse, un nombre trop proche de 0 (exposant inférieur à −1022) produit un <strong>soupassement</strong> (<em>underflow</em>) : le résultat est arrondi à zéro, ou une erreur est produite.</p>
+
+  <h2 id="arrondis">11. Les arrondis</h2>
+  <p>Il est rare que le résultat d'un calcul entre deux flottants soit représentable exactement sur 64 bits — même sans calcul, la plupart des nombres décimaux ne le sont pas. Par exemple, 0,4 admet un développement binaire infini périodique : $0{,}011001100110011\ldots$. La norme IEEE 754 impose alors d'arrondir à la valeur représentable la plus proche.</p>
+
+  <div class="box att">
+    <div class="box-title">Conséquence pratique</div>
+    <div class="box-body">L'addition sur les flottants n'est <strong>pas associative</strong> :
+      <pre style="margin:8px 0 0;">>>> 1 + 2**-54 - 1
+0.0
+>>> 1 - 1 + 2**-54
+5.551115123125783e-17</pre>
+      Dans le premier cas, $1 + 2^{-54}$ est arrondi à 1 avant la soustraction ; dans le second, $1-1$ est calculé exactement avant l'addition.
+    </div>
+  </div>
+
+  <p>On retiendra qu'il n'est pas possible de savoir avec certitude si le résultat d'un calcul flottant est égal à sa valeur théorique. Un test <code>a == b</code> n'a donc en général pas de sens pour deux flottants : on le remplace par une condition du type <code>abs(a - b) < epsilon</code>, où <code>epsilon</code> est choisi en fonction du problème et de l'ordre de grandeur des erreurs attendues.</p>
+
+  <div class="nextprev">
+    <a href="mpsi1.html">← Tous les chapitres</a>
+    <a href="mpsi1-support-02.html">Chapitre 2 : Introduction au langage Python →</a>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>TSI — 2ème année — Informatique</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#FFFFFF; --bg2:#F1F3F8; --panel:#F7F8FB; --line:#D8DCE6; --accent:#A93F58; --accent-dim:#8C4A5E; --ink:#1A1F2E; --ink-dim:#5B6478;}
+  *{box-sizing:border-box;}
+  body{margin:0; background:radial-gradient(ellipse at 15% -10%, #EEF1FA 0%, var(--bg) 55%); color:var(--ink); font-family:'IBM Plex Sans', sans-serif;}
+  .wrap{max-width:1080px; margin:0 auto; padding:0 28px;}
+  .topnav{padding:20px 0 0; font-family:'IBM Plex Mono',monospace; font-size:12px;}
+  .topnav a{color:var(--ink-dim); text-decoration:none;}
+  .topnav a:hover{color:var(--accent);}
+  .hero{padding:26px 0 60px; border-bottom:1px solid var(--line);}
+  .eyebrow{font-family:'IBM Plex Mono', monospace; font-size:12.5px; color:var(--accent); margin-bottom:18px;}
+  h1{font-family:'Space Grotesk', sans-serif; font-weight:700; font-size:clamp(30px, 4.5vw, 48px); line-height:1.1; margin:0 0 18px; max-width:780px;}
+  .hero p{color:var(--ink-dim); font-size:15.5px; line-height:1.6; max-width:560px; margin:0;}
+  .feature{display:block; margin:38px 0 56px; padding:30px 32px; background:var(--panel); border:1px solid var(--accent-dim); border-radius:8px; text-decoration:none; color:inherit; transition:border-color .2s ease, transform .2s ease;}
+  .feature:hover{border-color:var(--accent); transform:translateY(-2px);}
+  .feature .tag{display:inline-block; font-family:'IBM Plex Mono', monospace; font-size:11px; color:var(--accent); border:1px solid var(--accent-dim); padding:3px 10px; border-radius:100px; margin-bottom:14px;}
+  .feature h2{font-family:'Space Grotesk', sans-serif; font-size:23px; font-weight:700; margin:0 0 8px;}
+  .feature p{color:var(--ink-dim); font-size:14.5px; max-width:560px; margin:0 0 16px; line-height:1.55;}
+  .feature .go{font-family:'IBM Plex Mono', monospace; font-size:13px; color:var(--accent);}
+  .section-head{display:flex; align-items:baseline; justify-content:space-between; margin-bottom:22px;}
+  .section-head h2{font-family:'Space Grotesk', sans-serif; font-size:18px; font-weight:500; margin:0;}
+  .section-head .count{font-family:'IBM Plex Mono', monospace; font-size:12px; color:var(--ink-dim);}
+  .period-label{font-family:'IBM Plex Mono', monospace; font-size:11.5px; color:var(--ink-dim); margin:32px 0 14px; display:flex; align-items:center; gap:8px;}
+  .period-label .dot{width:7px; height:7px; border-radius:50%; background:var(--line);}
+  .period-label.p2 .dot{background:var(--accent-dim);}
+  .grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(230px, 1fr)); gap:14px;}
+  .card{display:block; padding:18px 18px 20px; background:var(--bg2); border:1px solid var(--line); border-radius:6px; text-decoration:none; color:inherit; transition:border-color .15s ease, transform .15s ease;}
+  .card:hover{border-color:var(--accent); transform:translateY(-1px);}
+  .card .num{font-family:'IBM Plex Mono', monospace; font-size:11px; color:var(--ink-dim); margin-bottom:9px; display:block;}
+  .card h3{font-family:'Space Grotesk', sans-serif; font-size:15px; font-weight:500; margin:0 0 7px; line-height:1.35;}
+  .card .status{font-family:'IBM Plex Mono', monospace; font-size:11px; color:#6B7593;}
+  footer{margin-top:70px; padding:24px 0 46px; border-top:1px solid var(--line); font-family:'IBM Plex Mono', monospace; font-size:11.5px; color:var(--ink-dim); display:flex; justify-content:space-between;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topnav"><a href="index.html">← Tous les programmes</a></div>
+  <div class="hero">
+    <div class="eyebrow">CPGE Mohammedia · Filière TSI</div>
+    <h1>TSI — 2ème année</h1>
+    <p>Consolider les bases de 1ère année, aborder l'algèbre linéaire numérique (Gauss, Lagrange) — puis les graphes, l'IA, les jeux et les bases de données.</p>
+  </div>
+  <a class="feature" href="tsi2-programme.html">
+    <span class="tag">Commencer ici</span>
+    <h2>Le programme de l'année</h2>
+    <p>La vue d'ensemble des dix chapitres, en trois habillages interchangeables : carte interactive, poster ou frise chronologique.</p>
+    <span class="go">Voir le programme →</span>
+  </a>
+  <div class="section-head"><h2>Supports par chapitre</h2><span class="count">10 chapitres</span></div>
+  <div class="period-label"><span class="dot"></span>Période 1</div>
+  <div class="grid"><a class="card p1" href="tsi2-support-01.html"><span class="num">Chapitre 1</span><h3>La complexité algorithmique</h3><span class="status">Support à venir</span></a><a class="card p1" href="tsi2-support-02.html"><span class="num">Chapitre 2</span><h3>Algorithmes de tri</h3><span class="status">Support à venir</span></a><a class="card p1" href="tsi2-support-03.html"><span class="num">Chapitre 3</span><h3>Les arbres binaires</h3><span class="status">Support à venir</span></a><a class="card p1" href="tsi2-support-04.html"><span class="num">Chapitre 4</span><h3>Méthode de Gauss</h3><span class="status">Support à venir</span></a><a class="card p1" href="tsi2-support-05.html"><span class="num">Chapitre 5</span><h3>Interpolation polynomiale de Lagrange</h3><span class="status">Support à venir</span></a><a class="card p1" href="tsi2-support-06.html"><span class="num">Chapitre 6</span><h3>Méta-heuristique</h3><span class="status">Support à venir</span></a></div>
+  <div class="period-label p2"><span class="dot"></span>Période 2</div>
+  <div class="grid"><a class="card p2" href="tsi2-support-07.html"><span class="num">Chapitre 7</span><h3>Introduction à la théorie des graphes</h3><span class="status">Support à venir</span></a><a class="card p2" href="tsi2-support-08.html"><span class="num">Chapitre 8</span><h3>Introduction à l'intelligence artificielle</h3><span class="status">Support à venir</span></a><a class="card p2" href="tsi2-support-09.html"><span class="num">Chapitre 9</span><h3>Introduction à la théorie des jeux</h3><span class="status">Support à venir</span></a><a class="card p2" href="tsi2-support-10.html"><span class="num">Chapitre 10</span><h3>Les bases de données relationnelles</h3><span class="status">Support à venir</span></a></div>
+  <footer><span>TSI — 2ème année — CPGE Mohammedia</span><span>Mis à jour au fil des séances</span></footer>
+</div>
+</body>
+</html>

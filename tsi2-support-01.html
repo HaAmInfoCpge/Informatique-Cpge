@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Chapitre 1 — Notions de complexité</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters:[{left:'$$',right:'$$',display:true},{left:'\\[',right:'\\]',display:true},{left:'$',right:'$',display:false}]});"></script>
+<style>
+  :root{
+    --bg:#FFFFFF; --bg2:#F1F3F8; --panel:#F7F8FB; --line:#D8DCE6;
+    --accent:#A93F58; --accent-dim:#8C4A5E;
+    --ink:#1A1F2E; --ink-dim:#5B6478;
+    --def:#2F5FA8; --def-bg:#EAF1FC;
+    --ex:#2F8F52; --ex-bg:#EAF7EE;
+    --att:#C23B3B; --att-bg:#FBE9E9;
+    --ast:#B08A1B; --ast-bg:#FBF3DC;
+    --rem:#6B7280; --rem-bg:#F1F2F4;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:radial-gradient(ellipse at 15% -10%, #F3EEF9 0%, var(--bg) 55%);
+    color:var(--ink); font-family:'IBM Plex Sans', sans-serif; line-height:1.65;
+  }
+  .topnav{
+    position:sticky; top:0; z-index:50; display:flex; justify-content:space-between; align-items:center;
+    padding:14px 26px; backdrop-filter:blur(8px); background:#FFFFFFcc; border-bottom:1px solid var(--line);
+    font-family:'IBM Plex Mono', monospace; font-size:12px;
+  }
+  .topnav a{color:var(--ink-dim); text-decoration:none;}
+  .topnav a:hover{color:var(--accent);}
+  .topnav .crumbs{display:flex; gap:10px;}
+  .topnav .crumbs span{opacity:.4;}
+
+  .wrap{max-width:760px; margin:0 auto; padding:0 24px 100px;}
+  .hero{padding:48px 0 20px;}
+  .tag{display:inline-block; font-family:'IBM Plex Mono', monospace; font-size:11.5px; color:var(--accent); border:1px solid var(--accent-dim); padding:3px 10px; border-radius:100px; margin-bottom:16px;}
+  h1{font-family:'Space Grotesk', sans-serif; font-size:clamp(26px,4vw,36px); font-weight:700; margin:0 0 14px; line-height:1.2;}
+  .intro{color:var(--ink-dim); font-size:15.5px; font-style:italic; border-left:2px solid var(--accent-dim); padding-left:18px; margin:24px 0 8px;}
+
+  .toc{
+    margin:32px 0 44px; padding:18px 22px; background:var(--panel); border:1px solid var(--line); border-radius:8px;
+    font-family:'IBM Plex Mono', monospace; font-size:12.5px;
+  }
+  .toc div{color:var(--ink-dim); margin-bottom:10px; text-transform:uppercase; letter-spacing:.04em; font-size:11px;}
+  .toc a{display:block; color:var(--ink); text-decoration:none; padding:3px 0; opacity:.85;}
+  .toc a:hover{color:var(--accent); opacity:1;}
+
+  h2{font-family:'Space Grotesk', sans-serif; font-size:21px; font-weight:600; margin:52px 0 16px; padding-top:10px; border-top:1px solid var(--line);}
+  h2:first-of-type{border-top:none;}
+  p{font-size:15px; margin:0 0 16px;}
+  strong{color:#0B0F1A; font-weight:600;}
+  em{color:var(--ink);}
+
+  ul, ol{padding-left:22px; font-size:15px;}
+  li{margin-bottom:8px;}
+
+  .box{margin:22px 0; border-radius:6px; overflow:hidden; border:1px solid; font-size:14.5px;}
+  .box .box-title{font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:12.5px; padding:9px 16px; letter-spacing:.02em;}
+  .box .box-body{padding:14px 16px 16px;}
+  .box.def{border-color:var(--def); background:var(--def-bg);} .box.def .box-title{background:var(--def); color:#FFFFFF;}
+  .box.ex{border-color:var(--ex); background:var(--ex-bg);} .box.ex .box-title{background:var(--ex); color:#FFFFFF;}
+  .box.att{border-color:var(--att); background:var(--att-bg);} .box.att .box-title{background:var(--att); color:#FFFFFF;}
+  .box.ast{border-color:var(--ast); background:var(--ast-bg);} .box.ast .box-title{background:var(--ast); color:#2a2408;}
+  .box.rem{border-color:var(--rem); background:var(--rem-bg);} .box.rem .box-title{background:var(--rem); color:#12151c;}
+  .box.missing{border-color:#5B4A6B; background:#F1EAF5; color:var(--ink-dim); font-family:'IBM Plex Mono',monospace; font-size:13px;}
+  .box.missing .box-title{background:#5B4A6B; color:#fff;}
+
+  table{width:100%; border-collapse:collapse; margin:22px 0; font-size:13.5px;}
+  th, td{border:1px solid var(--line); padding:9px 11px; text-align:left; vertical-align:top;}
+  th{background:var(--bg2); font-family:'Space Grotesk',sans-serif; font-weight:500; color:var(--accent);}
+  td{color:var(--ink-dim);}
+
+  .eqs{background:var(--bg2); border:1px solid var(--line); border-radius:6px; padding:16px 20px; margin:18px 0; text-align:center;}
+
+  .nextprev{display:flex; justify-content:space-between; margin-top:60px; padding-top:24px; border-top:1px solid var(--line); font-family:'IBM Plex Mono',monospace; font-size:12.5px;}
+  .nextprev a{color:var(--ink-dim); text-decoration:none;}
+  .nextprev a:hover{color:var(--accent);}
+</style>
+</head>
+<body>
+
+<div class="topnav">
+  <div class="crumbs"><a href="index.html">Accueil</a><span>/</span><a href="tsi2.html">TSI · 2ème année</a><span>/</span><a href="tsi2-programme.html">Programme</a></div>
+  <a href="tsi2.html">← Retour aux chapitres</a>
+</div>
+
+<div class="wrap">
+  <div class="hero">
+    <span class="tag">Chapitre 1 · Période 1 · TSI 2ème année</span>
+    <h1>Notions de complexité</h1>
+    <p class="intro">Dans ce chapitre, nous présentons la notion de complexité, qui décrit le temps et la mémoire nécessaires pour exécuter un algorithme et caractérise donc son efficacité. Nous étudions ensuite la complexité de tous les algorithmes présentés.</p>
+  </div>
+
+  <div class="toc">
+    <div>Sommaire</div>
+    <a href="#intro">1. Introduction</a>
+    <a href="#cout">2. Déterminer le coût d'un algorithme</a>
+    <a href="#notationO">3. Complexité et notation O</a>
+    <a href="#relationO">4. La relation O</a>
+    <a href="#complexites">5. Les complexités les plus utilisées</a>
+    <a href="#espace">6. Complexité en espace</a>
+    <a href="#recursif">7. Complexité des fonctions récursives</a>
+  </div>
+
+  <h2 id="intro">1. Introduction</h2>
+  <p>Un même problème peut être, le plus souvent, résolu par plusieurs algorithmes ; c'est pourquoi il est très important de pouvoir comparer l'efficacité des différents algorithmes pouvant être mis en œuvre pour résoudre ce problème. Deux critères principaux sont généralement considérés quand on étudie l'efficacité d'un algorithme : le premier est le <em>temps de calcul</em> — qu'on appelle aussi parfois <em>coût de l'algorithme</em> — le second est <em>l'espace mémoire</em> nécessaire à l'exécution de l'algorithme.</p>
+  <p>Si l'espace mémoire reste un critère important de l'évaluation de l'efficacité d'un algorithme, en pratique, dans la majorité des problèmes à résoudre, le temps de calcul devient le paramètre principal mesurant l'efficacité d'un algorithme. Par exemple, pour un logiciel interactif, un temps de réponse court est un élément essentiel du confort de l'utilisateur. De même, certains programmes industriels doivent être utilisés un grand nombre de fois dans un délai très court.</p>
+  <p>Dans ce cours, nous nous intéresserons à la <strong>complexité en temps</strong> d'un algorithme que, par abus de langage, nous appellerons simplement « <strong>complexité d'un algorithme</strong> ».</p>
+
+  <div class="box ex">
+    <div class="box-title">Exemple</div>
+    <div class="box-body">
+      <div class="box missing" style="margin:0 0 12px;"><div class="box-title" style="font-size:11px;">Code source</div><div class="box-body">Extrait indisponible — <code>div1.py</code>, lignes 1 à 4 (recherche naïve des diviseurs de n, par boucle de 1 à n).</div></div>
+      <p style="margin:0;">Cet algorithme réalise exactement <em>n</em> calculs de restes de divisions euclidiennes, <em>n</em> comparaisons et au plus <em>n</em> affichages.</p>
+    </div>
+  </div>
+
+  <p>Cependant, on peut aussi utiliser le fait que si $n = p \times q$ avec $p \geq \sqrt{n}$, alors $q$ est un diviseur de $n$ inférieur ou égal à $\sqrt{n}$. Il suffit donc de chercher chaque diviseur $q$ inférieur ou égal à $\sqrt{n}$ et de calculer $p = n/q$ pour obtenir tous les diviseurs. Dans le cas où $n$ est un carré parfait, on prend soin de ne pas afficher sa racine carrée deux fois :</p>
+
+  <div class="box missing"><div class="box-title" style="font-size:11px;">Code source</div><div class="box-body">Extrait indisponible — <code>div1.py</code>, lignes 6 à 12 (recherche optimisée des diviseurs, jusqu'à $\sqrt{n}$).</div></div>
+
+  <p>Cet algorithme réalise un calcul de racine carrée, $\lfloor \sqrt{n} \rfloor$ calculs de reste, entre $\lfloor \sqrt{n} \rfloor$ et $2\lfloor \sqrt{n} \rfloor$ comparaisons et entre 1 et $2\lfloor \sqrt{n} \rfloor$ affichages.</p>
+
+  <p>En général, on cherche à déterminer comment le temps d'exécution d'un algorithme varie en fonction d'un paramètre qu'on appelle la <strong>taille du problème</strong>. Le temps de recherche des diviseurs d'un entier $n$ dépend de $n$, qu'on pourra donc naturellement prendre comme taille du problème. Comme on l'a vu, selon l'algorithme, ce temps peut être proportionnel à $n$ ou à $\sqrt{n}$.</p>
+  <p>De même, quand on s'interroge sur l'efficacité d'un algorithme manipulant des tableaux, on cherche à comprendre comment le temps d'exécution varie en fonction du nombre d'éléments de ce tableau. Une autre possibilité pour la taille du problème est de considérer la taille de la représentation des données passées au programme : pour un programme traitant un texte, on prend par exemple pour taille du problème le nombre de caractères de ce texte.</p>
+  <p>L'évaluation du temps mis par un algorithme pour s'exécuter est un domaine de recherche à part entière, car elle se révèle parfois très difficile. Néanmoins, dans de nombreux cas, cette évaluation peut se faire en appliquant quelques règles simples.</p>
+
+  <h2 id="cout">2. Déterminer le coût d'un algorithme</h2>
+  <p>Pour déterminer le coût d'un algorithme, on se fonde en général sur le modèle de complexité suivant :</p>
+  <ul>
+    <li>Une affectation, une comparaison ou l'évaluation d'une opération arithmétique ayant en général un faible temps d'exécution, celui-ci sera considéré comme l'unité de mesure du coût d'un algorithme.</li>
+    <li>Le coût des instructions <code>p</code> et <code>q</code> en séquence est la somme des coûts de l'instruction <code>p</code> et de l'instruction <code>q</code>.</li>
+    <li>Le coût d'un test <code>if b: p else: q</code> est inférieur ou égal au maximum des coûts des instructions <code>p</code> et <code>q</code>, plus le temps d'évaluation de l'expression <code>b</code>.</li>
+    <li>Le coût d'une boucle <code>for i in iterable: p</code> est égal au nombre d'éléments de l'itérable multiplié par le coût de l'instruction <code>p</code> si ce dernier ne dépend pas de la valeur de <code>i</code>. Quand le coût du corps de la boucle dépend de la valeur de <code>i</code>, le coût total est la somme des coûts du corps de la boucle pour chaque valeur de <code>i</code>.</li>
+    <li>Le cas des boucles <code>while</code> est plus complexe à traiter puisque le nombre de répétitions n'est en général pas connu a priori. On peut majorer le nombre de répétitions de la même façon qu'on démontre sa terminaison, et ainsi majorer le coût de l'exécution de la boucle.</li>
+  </ul>
+
+  <h2 id="notationO">3. Complexité et notation O</h2>
+  <p>En réalité, lorsqu'on cherche à évaluer l'efficacité d'un algorithme, il est souvent inutile d'aller jusqu'à ce niveau de détail : on se contentera de dire que le nombre d'opérations élémentaires effectuées est par exemple proportionnel à $n$ ou à $\sqrt{n}$. Il y a plusieurs raisons à cela.</p>
+  <p>Les différentes opérations élémentaires considérées ne demandent pas toutes exactement le même temps de calcul et cachent donc un facteur multiplicatif, borné mais très compliqué à déterminer précisément. D'autre part, le même programme peut être exécuté sur deux machines différentes, l'une étant par exemple deux fois plus rapide que l'autre. Cela ne change évidemment rien à l'efficacité intrinsèque de l'algorithme : ce qui nous intéresse réellement n'est pas le temps précis d'exécution d'un programme, mais l'ordre de grandeur de ce temps en fonction de la taille des données.</p>
+  <p>Une dernière notion à considérer est celle du <strong>terme dominant</strong> dans le temps d'exécution d'un algorithme. Par exemple, si ce temps est proportionnel à $n^2+3n$, dès que la taille $n$ des données devient un peu importante, le terme $3n$ augmente beaucoup moins vite que $n^2$ : on dit qu'il est négligeable devant ce dernier. Pour décrire l'efficacité d'un algorithme, seul le terme qui croît le plus vite a donc un intérêt.</p>
+  <div class="box def">
+    <div class="box-title">Définition</div>
+    <div class="box-body">Pour $n \geq 3$, on a $n^2+3n \leq 2n^2$ ; la quantité $n^2+3n$ est donc bornée, à partir d'un certain rang, par le produit de $n^2$ et d'une constante. On dit alors que $n^2+3n$ est « un grand $O$ de $n^2$ » et on écrit $n^2+3n = O(n^2)$.</div>
+  </div>
+
+  <h2 id="relationO">4. La relation O</h2>
+  <p>La notation $f(x) = O(g(x))$ signifie qu'il existe $c > 0$ tel que $f(x) \leq c \cdot g(x)$ dès que $x$ est suffisamment grand. Elle ne s'applique qu'à des fonctions positives à partir d'une certaine valeur $n_0$. On a :</p>
+  <ul>
+    <li><strong>Réflexivité</strong> : $f(x) = O(f(x))$</li>
+    <li><strong>Transitivité</strong> : si $f(x) = O(g(x))$ et $g(x) = O(h(x))$, alors $f(x) = O(h(x))$</li>
+    <li><strong>Linéarité</strong> : si $f_1(x) = O(f_2(x))$ et $g_1(x) = O(g_2(x))$, alors $f_1(x) + a \cdot g_1(x) = O(f_2(x) + a \cdot g_2(x))$. Et $f(x) = O(a \cdot f(x))$ pour tout réel $a > 0$.</li>
+  </ul>
+  <p>De manière générale, on dira qu'un algorithme a une complexité en $O(f(n))$ si son coût est, à partir d'un certain rang, inférieur au produit de $f(n)$ par une constante.</p>
+
+  <h2 id="complexites">5. Les complexités les plus utilisées</h2>
+  <ul>
+    <li><strong>Constante — $O(1)$</strong> : accéder au premier élément d'un ensemble de données.</li>
+    <li><strong>Logarithmique — $O(\log n)$</strong> : couper un ensemble de données en deux parties égales, puis ces moitiés en deux parties égales, etc.</li>
+    <li><strong>Linéaire — $O(n)$</strong> : parcourir un ensemble de données.</li>
+    <li><strong>Quasi-linéaire — $O(n \log n)$</strong> : couper répétitivement un ensemble de données en deux et combiner les solutions partielles pour calculer la solution générale.</li>
+    <li><strong>Quadratique — $O(n^2)$</strong> : parcourir un ensemble de données en utilisant deux boucles imbriquées.</li>
+    <li><strong>Polynomiale — $O(n^p)$</strong> : parcourir un ensemble de données en utilisant $p$ boucles imbriquées.</li>
+    <li><strong>Exponentielle — $O(2^n)$</strong> : générer tous les sous-ensembles possibles d'un ensemble de données.</li>
+  </ul>
+
+  <p>Ordres de grandeur des temps d'exécution rencontrés en pratique pour un problème de taille $n = 10^6$, sur un ordinateur personnel effectuant un milliard d'opérations par seconde :</p>
+
+  <table>
+    <tr><th>Classe</th><th>Nom courant</th><th>Temps estimé</th><th>Remarques</th></tr>
+    <tr><td>$O(1)$</td><td>Temps constant</td><td>1 ns</td><td>Le temps d'exécution ne dépend pas des données traitées — c'est assez rare.</td></tr>
+    <tr><td>$O(\log n)$</td><td>Logarithmique</td><td>10 ns</td><td>Exécution quasi instantanée en pratique. C'est souvent $\log_2 n$ qui apparaît (codage binaire), mais la base n'a pas d'importance à une constante près.</td></tr>
+    <tr><td>$O(n)$</td><td>Linéaire</td><td>1 ms</td><td>Ne dépasse la minute que pour des données de taille comparable aux mémoires vives actuelles — la gestion mémoire devient alors le problème avant l'efficacité en temps.</td></tr>
+    <tr><td>$O(n^2)$</td><td>Quadratique</td><td>1/4 h</td><td>Reste acceptable pour des données de taille moyenne, mais pas au-delà.</td></tr>
+    <tr><td>$O(n^k)$</td><td>Polynomiale</td><td>30 ans si k=3</td><td>$n^k$ est le terme de plus haut degré ; les complexités en $O(n^3)$ ou $O(n^4)$ ne sont pas rares.</td></tr>
+    <tr><td>$O(2^n)$</td><td>Exponentielle</td><td>&gt; $10^{300000}$ milliards d'années</td><td>Impraticable sauf pour de très petites données ($n < 50$).</td></tr>
+  </table>
+
+  <h2 id="espace">6. Complexité en espace</h2>
+  <p>On appelle <strong>complexité en espace</strong> d'un algorithme la place nécessaire en mémoire pour le faire fonctionner. Elle s'exprime également sous la forme d'un $O(f(n))$ où $n$ est la taille du problème.</p>
+  <p>Évaluer la complexité en espace d'un algorithme ne pose pas de difficulté ; il suffit de faire le total des tailles en mémoire des différentes variables utilisées. Une première exception à la règle est le cas où on alloue dynamiquement de l'espace mémoire au cours du programme. L'autre cas est celui des <strong>fonctions récursives</strong>, qui cachent souvent une complexité en espace élevée.</p>
+
+  <h2 id="recursif">7. Complexité des fonctions récursives</h2>
+  <p>On explique ici comment calculer le coût d'une fonction récursive, à savoir le nombre d'opérations élémentaires qu'elle effectue ou son occupation mémoire totale. Prenons l'exemple d'une fonction récursive $u$ :</p>
+
+  <div class="box missing"><div class="box-title" style="font-size:11px;">Code source</div><div class="box-body">Extrait indisponible — <code>div1.py</code>, lignes 14 à 19 (fonction récursive <code>u</code> avec un seul appel récursif).</div></div>
+
+  <p>Évaluons le nombre d'opérations arithmétiques (addition, multiplication, division) qu'elle effectue. Si $n$ désigne la valeur de son argument, notons $C(n)$ ce nombre d'opérations :</p>
+  <div class="eqs">$$C(0) = 0 \qquad\qquad C(n) = C(n-1) + 3$$</div>
+  <p>Dans le cas $n=0$, on ne fait aucune opération arithmétique. Dans le cas $n>0$, on fait un appel récursif sur $n-1$, d'où $C(n-1)$ opérations, puis trois opérations arithmétiques (une multiplication, une addition et une division). Il s'agit d'une suite arithmétique de raison 3, dont le terme général est :</p>
+  <div class="eqs">$$C(n) = 3n$$</div>
+  <p>Le nombre d'opérations arithmétiques effectuées par $u$ est donc proportionnel à $n$.</p>
+
+  <p>Si en revanche on avait écrit $u$ plus naïvement, avec <strong>deux</strong> appels récursifs $u(n-1)$ :</p>
+
+  <div class="box missing"><div class="box-title" style="font-size:11px;">Code source</div><div class="box-body">Extrait indisponible — <code>div1.py</code>, lignes 22 à 26 (variante naïve à deux appels récursifs).</div></div>
+
+  <p>alors les équations définissant $C(n)$ seraient les suivantes :</p>
+  <div class="eqs">$$C(0) = 0 \qquad\qquad C(n) = C(n-1) + C(n-1) + 3$$</div>
+  <p>Il s'agit maintenant d'une suite arithmético-géométrique, dont le terme général est :</p>
+  <div class="eqs">$$C(n) = 3(2^n - 1)$$</div>
+
+  <div class="box att">
+    <div class="box-title">Point d'attention</div>
+    <div class="box-body">Un seul appel récursif de plus fait passer la complexité d'une croissance <strong>linéaire</strong> ($3n$) à une croissance <strong>exponentielle</strong> ($3(2^n-1)$). La structure des appels récursifs compte souvent plus que le nombre d'opérations dans le cas de base.</div>
+  </div>
+
+  <p>Une autre manière d'évaluer le coût d'une fonction récursive est de calculer le nombre d'appels, puis d'évaluer le coût de chaque appel. Si $A(n)$ note le nombre d'appels récursifs :</p>
+  <div class="eqs">
+    Premier cas : $\quad A(0) = 0 \quad A(n) = A(n-1) + 1$<br><br>
+    Second cas : $\quad A(0) = 0 \quad A(n) = A(n-1) + A(n-1) + 1$
+  </div>
+  <p>Le terme général est donc $A(n) = n$ dans le premier cas et $A(n) = 2^n - 1$ dans le second. Puisqu'il n'y a aucune opération arithmétique dans le cas de base ($n=0$) et exactement trois opérations arithmétiques dans le cas récursif, on retrouve immédiatement la valeur de $C(n)$ calculée précédemment.</p>
+
+  <div class="box rem">
+    <div class="box-title">Remarque</div>
+    <div class="box-body">D'une manière générale, la valeur de $C(n)$ ne se déduit pas toujours aussi facilement de $A(n)$ : il peut y avoir des opérations dans le cas de base et/ou un nombre d'opérations arithmétiques variant selon la valeur de $n$ dans le cas récursif.</div>
+  </div>
+
+  <p>Chaque appel récursif alloue de la mémoire pour les paramètres effectifs et les variables locales de cet appel. L'occupation mémoire d'un calcul récursif admet donc pour majorant le produit du nombre d'appels récursifs par la quantité de mémoire allouée par chaque appel. Dans les deux exemples précédents, l'occupation mémoire est donc $2n$ dans le premier cas (deux cases mémoire : $n$ et $x$) et $2^n - 1$ dans le second cas (une case mémoire, pour $n$). Cependant, dans le second cas, les $2^n - 1$ cases mémoire ne sont pas utilisées simultanément : celles allouées pour le premier appel à $u(n-1)$ peuvent être réutilisées pour le second. Pour une analyse plus fine de l'occupation mémoire, il convient donc de calculer le nombre d'appels imbriqués.</p>
+
+  <div class="nextprev">
+    <a href="tsi2.html">← Tous les chapitres</a>
+    <a href="tsi2-support-02.html">Chapitre 2 : Algorithmes de tri →</a>
+  </div>
+</div>
+</body>
+</html>

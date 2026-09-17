@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Chapitre 2 — Algorithmes de tri avancés</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters:[{left:'$$',right:'$$',display:true},{left:'\\[',right:'\\]',display:true},{left:'$',right:'$',display:false}]});"></script>
+<style>
+  :root{
+    --bg:#FFFFFF; --bg2:#F1F3F8; --panel:#F7F8FB; --line:#D8DCE6;
+    --accent:#17766F; --accent-dim:#2E8078;
+    --ink:#1A1F2E; --ink-dim:#5B6478;
+    --def:#2F5FA8; --def-bg:#EAF1FC;
+    --ex:#2F8F52; --ex-bg:#EAF7EE;
+    --att:#C23B3B; --att-bg:#FBE9E9;
+    --ast:#B08A1B; --ast-bg:#FBF3DC;
+    --rem:#6B7280; --rem-bg:#F1F2F4;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:radial-gradient(ellipse at 15% -10%, #F3EEF9 0%, var(--bg) 55%);
+    color:var(--ink); font-family:'IBM Plex Sans', sans-serif; line-height:1.65;
+  }
+  .topnav{
+    position:sticky; top:0; z-index:50; display:flex; justify-content:space-between; align-items:center;
+    padding:14px 26px; backdrop-filter:blur(8px); background:#FFFFFFcc; border-bottom:1px solid var(--line);
+    font-family:'IBM Plex Mono', monospace; font-size:12px;
+  }
+  .topnav a{color:var(--ink-dim); text-decoration:none;}
+  .topnav a:hover{color:var(--accent);}
+  .topnav .crumbs{display:flex; gap:10px;}
+  .topnav .crumbs span{opacity:.4;}
+
+  .wrap{max-width:760px; margin:0 auto; padding:0 24px 100px;}
+  .hero{padding:48px 0 20px;}
+  .tag{display:inline-block; font-family:'IBM Plex Mono', monospace; font-size:11.5px; color:var(--accent); border:1px solid var(--accent-dim); padding:3px 10px; border-radius:100px; margin-bottom:16px;}
+  h1{font-family:'Space Grotesk', sans-serif; font-size:clamp(26px,4vw,36px); font-weight:700; margin:0 0 14px; line-height:1.2;}
+  .intro{color:var(--ink-dim); font-size:15.5px; font-style:italic; border-left:2px solid var(--accent-dim); padding-left:18px; margin:24px 0 8px;}
+
+  .toc{margin:32px 0 44px; padding:18px 22px; background:var(--panel); border:1px solid var(--line); border-radius:8px; font-family:'IBM Plex Mono', monospace; font-size:12.5px;}
+  .toc div{color:var(--ink-dim); margin-bottom:10px; text-transform:uppercase; letter-spacing:.04em; font-size:11px;}
+  .toc a{display:block; color:var(--ink); text-decoration:none; padding:3px 0; opacity:.85;}
+  .toc a:hover{color:var(--accent); opacity:1;}
+
+  h2{font-family:'Space Grotesk', sans-serif; font-size:21px; font-weight:600; margin:52px 0 16px; padding-top:10px; border-top:1px solid var(--line);}
+  h2:first-of-type{border-top:none;}
+  h3{font-family:'Space Grotesk', sans-serif; font-size:16.5px; font-weight:500; margin:28px 0 10px;}
+  p{font-size:15px; margin:0 0 16px;}
+  strong{color:#0B0F1A; font-weight:600;}
+  em{color:var(--ink);}
+  code{background:var(--bg2); padding:1px 6px; border-radius:4px; font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--accent);}
+
+  ul, ol{padding-left:22px; font-size:15px;}
+  li{margin-bottom:8px;}
+
+  .box{margin:22px 0; border-radius:6px; overflow:hidden; border:1px solid; font-size:14.5px;}
+  .box .box-title{font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:12.5px; padding:9px 16px; letter-spacing:.02em;}
+  .box .box-body{padding:14px 16px 16px;}
+  .box.def{border-color:var(--def); background:var(--def-bg);} .box.def .box-title{background:var(--def); color:#FFFFFF;}
+  .box.ex{border-color:var(--ex); background:var(--ex-bg);} .box.ex .box-title{background:var(--ex); color:#FFFFFF;}
+  .box.att{border-color:var(--att); background:var(--att-bg);} .box.att .box-title{background:var(--att); color:#FFFFFF;}
+  .box.ast{border-color:var(--ast); background:var(--ast-bg);} .box.ast .box-title{background:var(--ast); color:#2a2408;}
+  .box.rem{border-color:var(--rem); background:var(--rem-bg);} .box.rem .box-title{background:var(--rem); color:#12151c;}
+  .box.code-note{border-color:#8C6FAE; background:#F5F1FA; font-family:'IBM Plex Mono',monospace; font-size:12.5px; color:var(--ink-dim);}
+  .box.code-note .box-title{background:#8C6FAE; color:#fff;}
+
+  table{width:100%; border-collapse:collapse; margin:22px 0; font-size:13.5px;}
+  th, td{border:1px solid var(--line); padding:9px 11px; text-align:left; vertical-align:top;}
+  th{background:var(--bg2); font-family:'Space Grotesk',sans-serif; font-weight:500; color:var(--accent);}
+  td{color:var(--ink-dim);}
+
+  .eqs{background:var(--bg2); border:1px solid var(--line); border-radius:6px; padding:16px 20px; margin:18px 0; text-align:center;}
+
+  .figure{margin:26px 0; background:#F4F2EC; border:1px solid var(--line); border-radius:8px; padding:18px 18px 8px; text-align:center;}
+  .figure img{max-width:100%; height:auto; display:inline-block; border-radius:3px;}
+  .figure .caption{font-family:'IBM Plex Mono', monospace; font-size:11.5px; color:var(--ink-dim); text-align:center; padding:12px 4px 6px; background:var(--bg2); margin:14px -18px 0; border-top:1px solid var(--line);}
+
+  pre{background:var(--bg2); border:1px solid var(--line); border-radius:6px; padding:14px 16px; overflow-x:auto; font-family:'IBM Plex Mono',monospace; font-size:12.5px; color:var(--ink); margin:18px 0;}
+
+  .nextprev{display:flex; justify-content:space-between; margin-top:60px; padding-top:24px; border-top:1px solid var(--line); font-family:'IBM Plex Mono',monospace; font-size:12.5px;}
+  .nextprev a{color:var(--ink-dim); text-decoration:none;}
+  .nextprev a:hover{color:var(--accent);}
+</style>
+</head>
+<body>
+
+<div class="topnav">
+  <div class="crumbs"><a href="index.html">Accueil</a><span>/</span><a href="mppsi2.html">MP / PSI · 2ème année</a><span>/</span><a href="mppsi2-programme.html">Programme</a></div>
+  <a href="mppsi2.html">← Retour aux chapitres</a>
+</div>
+
+<div class="wrap">
+  <div class="hero">
+    <span class="tag">Chapitre 2 · Période 1 · MP/PSI 2ème année</span>
+    <h1>Algorithmes de tri avancés</h1>
+    <p class="intro">Ce chapitre se concentre sur les algorithmes de tri performants, conçus pour traiter efficacement des listes volumineuses. Nous nous intéresserons particulièrement à deux méthodes : le tri fusion et le tri rapide.</p>
+  </div>
+
+  <div class="box code-note">
+    <div class="box-title" style="font-size:11px;">Note sur le code</div>
+    <div class="box-body">Le fichier source <code>chap2.py</code> référencé par ton cours n'a pas été fourni. Le code ci-dessous a été reconstruit pour correspondre fidèlement à la description algorithmique et aux preuves de ton <code>.tex</code> (mêmes noms de fonctions, mêmes invariants) — à vérifier ligne à ligne face à ton fichier original si tu me l'envoies.</div>
+  </div>
+
+  <div class="toc">
+    <div>Sommaire</div>
+    <a href="#diviser">1. La stratégie « Diviser pour régner »</a>
+    <a href="#fusion">2. Tri fusion</a>
+    <a href="#rapide">3. Tri rapide (QuickSort)</a>
+    <a href="#conclusion">4. Conclusion et comparaison des tris</a>
+  </div>
+
+  <p>Ces deux algorithmes s'appuient sur la stratégie <em>« diviser pour régner »</em>. Ils surpassent en efficacité les tris quadratiques (vus en première année) dès que le nombre d'éléments à trier excède environ 50.</p>
+  <p>Le tri fusion présente une complexité quasi-linéaire $O(n \log n)$ même dans le pire scénario. En revanche, le tri rapide peut atteindre une complexité quadratique dans le pire cas, bien qu'il affiche généralement une performance quasi-linéaire en moyenne.</p>
+  <p>Un avantage notable du tri rapide est qu'il s'effectue <strong>en place</strong>, c'est-à-dire sans nécessiter de mémoire supplémentaire significative, contrairement au tri fusion. Cette caractéristique en fait souvent l'option la plus efficace en pratique.</p>
+  <p>Il existe également un autre algorithme, le <strong>tri par tas</strong>, qui combine les avantages d'une complexité quasi-linéaire dans le pire cas et d'un fonctionnement en place. Ce dernier pourrait faire l'objet d'une étude approfondie ultérieure.</p>
+
+  <h2 id="diviser">1. La stratégie « Diviser pour régner »</h2>
+  <p>On rappelle ici les principes de la stratégie « diviser pour régner » :</p>
+  <ul>
+    <li>Diviser le problème principal en sous-problèmes disjoints de tailles inférieures (<strong>division</strong>).</li>
+    <li>Traiter récursivement les sous-problèmes.</li>
+    <li>Recomposer la solution du problème principal à partir des solutions des sous-problèmes (<strong>règne</strong>).</li>
+  </ul>
+  <p>Concrètement, pour trier une liste avec ces algorithmes, on la décompose en sous-listes plus petites. Le <strong>tri fusion</strong> coupe la liste en deux parties de taille similaire. Une fois ces parties triées séparément, on les combine en une seule liste triée. Le <strong>tri rapide</strong>, lui, choisit un élément (le pivot) et réorganise la liste de sorte que tous les éléments plus petits soient à gauche et les plus grands à droite. On répète ce processus sur les deux sous-listes obtenues jusqu'à ce que la liste entière soit triée.</p>
+
+  <h2 id="fusion">2. Tri fusion</h2>
+  <p>Contrairement aux tris quadratiques vus en première année, le tri fusion proposé dans ce chapitre ne trie pas la liste initiale mais retourne une copie triée : en effet, il est très difficile d'écrire un tri fusion qui utilise un espace mémoire constant en plus de la liste à trier.</p>
+
+  <h3>La fonction de fusion</h3>
+  <p>Comme nous l'avons vu, la partie la plus délicate du tri fusion est l'opération de fusion. Cette fonction prend en entrée deux listes déjà triées et produit en sortie une nouvelle liste contenant tous les éléments des listes d'entrée, triés dans le même ordre croissant.</p>
+  <p><strong>Principe.</strong> On va parcourir les deux listes de gauche à droite au moyen de deux indices <code>i1</code> et <code>i2</code>. À chaque étape, le plus petit élément parmi <code>L1[i1]</code> et <code>L2[i2]</code> est ajouté à la fin de la liste <code>L</code> (initialement vide), et l'indice correspondant est incrémenté. Une petite difficulté se produit lorsqu'on a terminé la lecture d'une des deux listes : il faut alors faire attention à ne pas tenter d'accéder à des éléments en dehors des listes.</p>
+
+  <div class="figure">
+    <img src="images/merge.png" alt="Illustration de la fusion de deux listes triées">
+    <div class="caption">Figure 1 — Illustration de la fusion de deux listes triées</div>
+  </div>
+
+  <p><strong>Code Python.</strong> Il s'agit simplement d'une boucle, exécutée au plus $n_1 + n_2$ fois, avec $n_1$ et $n_2$ les tailles des listes <code>L1</code> et <code>L2</code> :</p>
+  <pre>def fusion(L1, L2):
+    n1, n2 = len(L1), len(L2)
+    i1, i2 = 0, 0
+    L = []
+    while i1 < n1 and i2 < n2:
+        # invariant : L est triée dans l'ordre croissant
+        # et ses éléments sont ceux de L1[0:i1] et L2[0:i2]
+        if L1[i1] <= L2[i2]:
+            L.append(L1[i1])
+            i1 += 1
+        else:
+            L.append(L2[i2])
+            i2 += 1
+    # après la boucle : on complète avec le reliquat de la liste non épuisée
+    L += L1[i1:]
+    L += L2[i2:]
+    return L</pre>
+
+  <p><strong>Terminaison et correction.</strong> Faisons une analyse plus détaillée en utilisant le variant et l'invariant de boucle.</p>
+  <div class="box def">
+    <div class="box-title">Invariant de boucle</div>
+    <div class="box-body">« <code>L</code> est triée dans l'ordre croissant et ses éléments sont ceux de <code>L1[0:i1]</code> et <code>L2[0:i2]</code> ». <br><br>
+    <strong>Initialisation</strong> : avant la première itération, <code>L</code> est vide, <code>i1 = i2 = 0</code>, donc l'invariant est vrai.<br>
+    <strong>Conservation</strong> : à chaque itération, on ajoute soit <code>L1[i1]</code>, soit <code>L2[i2]</code> à <code>L</code>, en choisissant le plus petit. <code>L</code> reste donc triée et ne contient que des éléments de <code>L1[0:i1]</code> et <code>L2[0:i2]</code>.<br>
+    <strong>Terminaison</strong> : quand la boucle se termine, l'invariant est toujours vrai : <code>L</code> contient tous les éléments traités, triés dans l'ordre croissant.</div>
+  </div>
+  <div class="box def">
+    <div class="box-title">Variant de boucle</div>
+    <div class="box-body">
+      <div class="eqs">$$V = n_1 + n_2 - (i_1 + i_2)$$</div>
+      Il est toujours positif ou nul tant que la boucle continue (car $i_1 \leq n_1$ et $i_2 \leq n_2$), et décroît strictement à chaque itération, car soit $i_1$, soit $i_2$ est incrémenté de 1. Quand $V$ atteint 0, cela signifie que $i_1+i_2 = n_1+n_2$ : tous les éléments ont été traités.
+    </div>
+  </div>
+  <p>La <strong>terminaison</strong> est garantie par le variant de boucle : comme $V$ décroît strictement à chaque itération et est borné inférieurement par 0, la boucle se termine nécessairement en un nombre fini d'étapes. La <strong>correction</strong> est assurée par l'invariant : à la fin de la boucle, <code>L</code> contient tous les éléments traités de <code>L1</code> et <code>L2</code>, triés dans l'ordre croissant. Ces deux dernières lignes préservent l'invariant et n'affectent pas la complexité globale.</p>
+  <p><strong>Complexité.</strong> La boucle s'exécute au plus $n_1+n_2$ fois (le variant initial), chaque itération ayant une complexité $O(1)$. La complexité totale de la fusion est donc $O(n_1+n_2)$.</p>
+
+  <h3>Le tri fusion</h3>
+  <p><strong>Idée.</strong> Si la liste contient 0 ou 1 élément, elle est triée et on retourne une copie de cette liste (<code>L[:]</code>). Sinon, on la coupe en deux (en notant $m = \lfloor n/2 \rfloor$ où $n$ est la taille de la liste), on trie récursivement les deux parties, et on fusionne les deux listes obtenues.</p>
+  <pre>def tri_fusion(L):
+    n = len(L)
+    if n <= 1:
+        return L[:]
+    m = n // 2
+    return fusion(tri_fusion(L[:m]), tri_fusion(L[m:]))</pre>
+
+  <p><strong>Terminaison.</strong> Immédiate : si la taille de la liste est au plus 1, on renvoie une copie ; sinon on sépare la liste en deux (<code>0 &lt; m &lt; n</code>), donc les deux listes sont de tailles strictement inférieures à $n$, on appelle récursivement <code>tri_fusion</code> sur les deux listes, puis on fusionne le résultat.</p>
+  <div class="box ex">
+    <div class="box-title">Correction — par récurrence forte sur la taille de la liste</div>
+    <div class="box-body">Soit $P(n)$ : « <code>tri_fusion(L)</code> retourne une copie triée dans l'ordre croissant de la liste <code>L</code> si celle-ci est de taille $n$ ».<br><br>
+    Si $n=0$ ou $1$, c'est immédiat. Sinon, avec $m = \lfloor n/2 \rfloor$, comme $m<n$ et $n-m<n$, par hypothèse de récurrence les listes <code>tri_fusion(L[:m])</code> et <code>tri_fusion(L[m:])</code> sont bien des copies triées de <code>L[:m]</code> et <code>L[m:]</code>. Ainsi $P(n)$ est vraie car la fonction <code>fusion</code> est correcte. Par principe de récurrence, <code>tri_fusion(L)</code> est correcte.</div>
+  </div>
+
+  <p><strong>Complexité.</strong> La fonction <code>fusion</code> a une complexité $O(n)$ pour fusionner deux listes de taille totale $n$ ; construire les listes <code>L[:m]</code> et <code>L[m:]</code> prend également un temps $O(n)$. La complexité du tri vérifie, pour $n \geq 2$ :</p>
+  <div class="eqs">$$C(n) = C\left(\left\lfloor\frac{n}{2}\right\rfloor\right) + C\left(\left\lceil\frac{n}{2}\right\rceil\right) + O(n)$$</div>
+  <p>En résolvant cette récurrence pour les puissances de 2, $C(2^p) = 2\,C(2^{p-1}) + O(2^p)$ pour tout $p \geq 1$. En divisant par $2^p$ :</p>
+  <div class="eqs">$$\frac{C(2^p)}{2^p} = C(1) + \sum_{k=1}^{p}\underbrace{\left[\frac{C(2^k)}{2^k}-\frac{C(2^{k-1})}{2^{k-1}}\right]}_{O(1)} = O(p)$$</div>
+  <p>D'où $C(n) = O(n \log n)$ car $p = \log_2(n)$. Ce résultat s'étend à $n$ quelconque, ce que l'on admettra ici. Dans ce cas, l'arbre des appels récursifs est équilibré : tous les niveaux contribuent pour $O(n)$ à la complexité totale.</p>
+
+  <div class="figure">
+    <img src="images/tree_rec.png" alt="Arbre des appels récursifs du tri fusion, liste de taille n = 2^k">
+    <div class="caption">Figure 2 — Complexité du tri fusion sur une liste de taille n = 2ᵏ</div>
+  </div>
+
+  <div class="box rem">
+    <div class="box-title">Propriété</div>
+    <div class="box-body">Le tri fusion ne s'effectue <strong>pas en place</strong> — on renvoie une copie triée de la liste (ou au mieux, on utilise une liste de même taille pour effectuer les fusions) — mais il est <strong>stable</strong>.</div>
+  </div>
+
+  <h2 id="rapide">3. Tri rapide (QuickSort)</h2>
+  <p>Le tri rapide a été inventé par Hoare en 1961. Bien implémenté, il est probablement le tri le plus efficace en pratique. Bien que sa complexité dans le pire cas soit quadratique, il possède une très bonne complexité en moyenne. Il a de plus l'avantage de s'effectuer en place, contrairement au tri fusion. Tout comme ce dernier, il repose sur la stratégie diviser pour régner.</p>
+  <p><strong>Idée.</strong> Contrairement au tri fusion, on ne coupe pas arbitrairement en deux. Supposons que l'on veuille trier la séquence 4, 1, 8, 3, 2, 5, 7, 6. On choisit le premier élément (c'est arbitraire) comme pivot, et on sépare les autres éléments en deux ensembles : {1, 2, 3} et {5, 6, 7, 8}. Les éléments du premier ensemble sont plus petits que le pivot, ceux du deuxième plus grands. Il suffit alors de trier récursivement les deux ensembles pour obtenir une liste triée, en intercalant le pivot au milieu.</p>
+
+  <h3>Fonction de partition</h3>
+  <p>L'avantage du tri rapide sur le tri fusion est qu'il peut s'écrire facilement « en place », sans recourir à des listes intermédiaires : on travaille sur des portions de la liste initiale. La fonction à écrire prend en entrée une liste <code>L</code>, et deux indices <code>g</code> et <code>d</code> délimitant la sous-liste à partitionner, <code>L[g:d]</code> (avec $d-g \geq 2$). L'idée :</p>
+  <ul>
+    <li>On choisit (arbitrairement) le pivot comme étant le premier élément de la portion, <code>L[g]</code>.</li>
+    <li>On parcourt le reste de la portion en gardant une séparation en deux morceaux : celui des éléments strictement inférieurs au pivot, et celui des éléments supérieurs ou égaux (le pivot reste à l'indice <code>g</code>).</li>
+    <li>Une fois la portion parcourue, on amène le pivot à la jonction des deux morceaux.</li>
+    <li>On renvoie l'indice où se trouve le pivot à la fin de la partition, pour les appels récursifs à venir.</li>
+  </ul>
+
+  <div class="figure">
+    <img src="images/partitionner.png" alt="Exemple de partition avec pivot 5">
+    <div class="caption">Figure 3 — Le pivot est 5 ; l'élément examiné (en rouge) est permuté avec l'élément ≥ pivot le plus à gauche s'il est strictement inférieur, sinon rien ne se passe</div>
+  </div>
+
+  <p><strong>Code Python.</strong> On repère par un indice <code>m</code> la position de l'élément le plus à droite parmi ceux strictement inférieurs au pivot :</p>
+  <pre>def partition(L, g, d):
+    pivot = L[g]
+    m = g
+    for i in range(g + 1, d):
+        if L[i] < pivot:
+            m += 1
+            if m < i:
+                L[m], L[i] = L[i], L[m]
+    if m > g:
+        L[g], L[m] = L[m], L[g]
+    return m</pre>
+
+  <div class="box ex">
+    <div class="box-title">Terminaison et correction</div>
+    <div class="box-body">Il est clair que cette fonction termine (boucle <code>for</code> bornée). Invariant de boucle $Inv_i$ : « les éléments de <code>L[g+1:m+1]</code> sont strictement inférieurs au pivot <code>L[g]</code>, les éléments de <code>L[m+1:i]</code> lui sont supérieurs, avec $i \geq m+1$ ».<br><br>
+    $Inv_{g+1}$ est vrai en début de boucle (les deux sous-listes sont vides). Si $Inv_i$ est vrai et <code>L[i] &gt;= pivot</code>, on ne fait rien ; si <code>L[i] &lt; pivot</code>, on incrémente <code>m</code> puis on échange <code>L[i]</code> et <code>L[m]</code> : $Inv_{i+1}$ est vrai. Par suite $Inv_d$ est vrai en fin de boucle, et le dernier échange amène le pivot en position <code>m</code>, qui est renvoyée.</div>
+  </div>
+  <p><strong>Complexité.</strong> La complexité de <code>partition(L, g, d)</code> est $O(d-g)$, la taille de la portion.</p>
+
+  <h3>Le tri en lui-même</h3>
+  <p><strong>Idée.</strong> Si l'on a une portion délimitée par <code>g</code> (inclus) et <code>d</code> (exclus) à trier : si $g \geq d-1$, la portion possède 0 ou 1 élément et est déjà triée ; sinon, on réalise une partition avec ces indices, on obtient l'indice <code>m</code> du pivot, et il suffit de recommencer sur les portions $(g, m)$ et $(m+1, d)$.</p>
+  <pre>def aux(L, g, d):
+    if g < d - 1:
+        m = partition(L, g, d)
+        aux(L, g, m)
+        aux(L, m + 1, d)
+
+def tri_rapide(L):
+    aux(L, 0, len(L))</pre>
+  <p>La fonction <code>tri_rapide</code> se contente d'appeler <code>aux</code> entre les indices 0 et <code>len(L)</code>. Les preuves de terminaison et de correction sont très semblables à celles du tri fusion.</p>
+
+  <div class="box att">
+    <div class="box-title">Complexité — pire cas</div>
+    <div class="box-body">Supposons la liste triée dans l'ordre croissant. Le premier appel à <code>partition</code> réalise une très mauvaise partition (le pivot renvoyé est en position 0) ; <code>aux(0,0)</code> ne fait rien, et <code>aux(1, len(L))</code> revient à recommencer sur <code>L[1:]</code>. Le tri est alors quadratique en nombre de comparaisons — pas meilleur qu'un tri par sélection.</div>
+  </div>
+
+  <p><strong>Complexité — meilleur cas.</strong> Si chaque appel à <code>partition</code> sépare les éléments en deux parties égales à un élément près, la complexité est en $O(n \log n)$, la récurrence étant, à peu de chose près, celle du tri fusion.</p>
+
+  <p><strong>Complexité — cas moyen (heuristique).</strong> Considérons une situation où les partitions ne sont ni mauvaises ni très bonnes, par exemple toujours un cinquième des éléments d'un côté et quatre cinquièmes de l'autre. L'arbre des appels récursifs est tordu par rapport à celui du tri fusion (les portions de droite sont plus grandes), mais la portion de droite étant de taille $\frac{4^k n}{5^k}$, la hauteur reste en $O(\log n)$ car $\left(\frac{4}{5}\right)^k n \leq 1$ pour $k \geq \log_{5/4}(n)$. Chaque niveau étant en $O(n)$, la complexité reste en $O(n \log n)$ — même avec un ratio plus défavorable comme $\frac{1}{100}, \frac{99}{100}$, la conclusion serait la même : c'est seulement dans le pire cas que la complexité devient quadratique.</p>
+
+  <div class="figure">
+    <img src="images/tree_quick.png" alt="Arbre des appels récursifs du tri rapide, ratios 1/5 et 4/5">
+    <div class="caption">Figure 4 — Complexité du tri rapide, partitions aux ratios 1/5, 4/5</div>
+  </div>
+
+  <div class="box def">
+    <div class="box-title">Complexité moyenne — preuve</div>
+    <div class="box-body">
+      On suppose les éléments distincts et les positions relatives équiprobables. Puisque le tri fonctionne par comparaisons, on suppose la liste constituée de $\{0,1,\ldots,n-1\}$, et on compte le nombre de comparaisons en moyenne :
+      <div class="eqs">$$C_{\text{comp,moy}}(n) = \frac{1}{n!}\sum_{\sigma \in \mathfrak{S}_n} C_{\text{comp}}([\sigma(0),\ldots,\sigma(n-1)])$$</div>
+      Deux éléments $i<j$ ne sont comparés qu'au plus une fois, si et seulement si l'un des deux est un pivot au moment où <code>partition</code> s'applique sur une sous-liste contenant à la fois $i$ et $j$. Pour $U_{i,j} = \{i,\ldots,j\}$ :
+      <div class="eqs">$$i \text{ et } j \text{ sont comparés} \iff i \text{ ou } j \text{ est le premier élément de } U_{i,j} \text{ choisi comme pivot}$$</div>
+      Tout élément de $U_{i,j}$ ayant même probabilité $\frac{1}{j-i+1}$ d'être choisi en premier, en notant $X$ le nombre total de comparaisons :
+      <div class="eqs">$$\mathbb{E}(X) = \sum_{i<j}\mathbb{E}(X_{i,j}) = \sum_{i=0}^{n-2}\sum_{j=i+1}^{n-1}\frac{2}{j-i+1} \underset{n\to+\infty}{\sim} 2n\ln(n) = O(n\log n)$$</div>
+      Le nombre de comparaisons moyen étant en $O(n\log n)$, et la complexité de <code>partition</code> étant linéaire en ce nombre, la complexité moyenne du tri rapide est $O(n \log n)$.
+    </div>
+  </div>
+
+  <p><strong>Propriétés.</strong> L'avantage du tri rapide sur le tri fusion est qu'il s'effectue en place. Par contre, il n'est <strong>pas stable</strong>.</p>
+
+  <p><strong>Optimisations.</strong> Une liste déjà triée est un pire cas pour le tri rapide. Plutôt que de mélanger la liste au préalable, il est plus judicieux de modifier <code>partition</code> pour que le pivot de <code>L[g:d]</code> ne soit pas systématiquement <code>L[g]</code>, mais un élément pris au hasard dans <code>L[g:d]</code> :</p>
+  <pre>from random import randint
+    k = randint(g, d - 1)
+    L[g], L[k] = L[k], L[g]</pre>
+  <p>où <code>randint(a, b)</code>, importée du module <code>random</code>, retourne un élément aléatoire de l'intervalle $[a,b]$. Une deuxième optimisation possible : si l'algorithme (même dans sa version aléatoire) est proche du pire cas, on risque sur de grandes listes de dépasser la limite des 1000 appels récursifs imbriqués de Python. Pour y remédier, on peut transformer l'appel récursif sur la plus grande des sous-listes en boucle <code>while</code>.</p>
+
+  <h2 id="conclusion">4. Conclusion et comparaison des tris</h2>
+  <p>Le tableau suivant récapitule les résultats montrés sur les deux tris efficaces de ce chapitre :</p>
+  <table>
+    <tr><th>Tri</th><th>Pire cas</th><th>Meilleur cas</th><th>Cas moyen</th></tr>
+    <tr><td>Tri fusion</td><td>$O(n \log n)$</td><td>$O(n \log n)$</td><td>$O(n \log n)$</td></tr>
+    <tr><td>Tri rapide</td><td>$O(n^2)$</td><td>$O(n \log n)$</td><td>$O(n \log n)$</td></tr>
+  </table>
+
+  <p>Les deux graphiques suivants présentent les temps d'exécution des tris de ce chapitre ainsi que des tris naïfs, sur des listes aléatoires de taille variant entre 10 et 1000. On voit qu'il vaut mieux utiliser un tri efficace dès que la taille de la liste atteint quelques dizaines. Pour des listes de taille moyenne (plus de 500 éléments), le temps d'exécution des deux tris rapides est bien inférieur à celui des tris quadratiques.</p>
+
+  <div class="figure">
+    <img src="images/ex.png" alt="Comparaison des temps d'exécution des différents tris">
+    <div class="caption">Figure 5 — Comparaison des tris pour des tailles de 10 à 100 (gauche) et de 100 à 1000 (droite). Temps en secondes, moyenne sur 100 listes différentes.</div>
+  </div>
+
+  <p>Sur ces listes aléatoires, le tri rapide est incontestablement le meilleur, alors que si l'on somme les opérations élémentaires effectuées, on trouve un léger avantage au tri fusion ($2n\log_2(n) = \frac{2}{\ln(2)}n\ln(n)$, et $\frac{2}{\ln(2)} \approx 2{,}89 < 4$). L'avantage pratique du tri rapide est dû au fait qu'il s'exécute en place.</p>
+
+  <div class="nextprev">
+    <a href="mppsi2-support-01.html">← Chapitre 1 : Notions de complexité</a>
+    <a href="mppsi2-support-03.html">Chapitre 3 : Les arbres binaires →</a>
+  </div>
+</div>
+</body>
+</html>
